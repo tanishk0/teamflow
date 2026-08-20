@@ -4,11 +4,21 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./index.css";
 import App from "./App.jsx";
+import LoginPage from "../pages/auth/LoginPage.jsx";
+import SignupPage from "../pages/auth/SignupPage.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/signup",
+    element: <SignupPage />,
   },
 ]);
 
