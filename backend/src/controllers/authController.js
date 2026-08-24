@@ -21,13 +21,24 @@ export async function signup(req, res) {
             password: hash_password,
         })
         const savedUser = await user.save();
+        const token = jwt.sign(
+            {userId: savedUser._id},
+            process.env.JWT_SECRET,
+            {expiresIn: "7d"}
+        )
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         res.status(201).json({
             message: "Account created successfully"
         })
     }
     catch(error){
         console.log(error)
-        res.status(400).json({
+        res.status(500).json({
             message: "Error while saving the user",
         })
     }
