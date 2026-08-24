@@ -40,6 +40,8 @@ export async function signup(req, res) {
         )
         res.cookie("token", token, {
             httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
         res.status(201).json({
@@ -57,6 +59,13 @@ export async function signup(req, res) {
 export async function signin(req, res){
     //login logic
     const {email , password} = req.body;
+    const emailError = validateEmail(email);
+
+    if (emailError || !password) {
+        return res.status(400).json({
+            message: emailError || "Password is required"
+        });
+    }
     try {
         const existingUser = await User.findOne({email})
         if(!existingUser){
@@ -79,6 +88,8 @@ export async function signin(req, res){
         //Adding token to cookie
         res.cookie("token" , token, {
             httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
         res.status(200).json({
