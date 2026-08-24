@@ -28,8 +28,6 @@ export async function signup(req, res) {
         )
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
         res.status(201).json({
@@ -40,6 +38,45 @@ export async function signup(req, res) {
         console.log(error)
         res.status(500).json({
             message: "Error while saving the user",
+        })
+    }
+}
+
+export async function signin(req, res){
+    //login logic
+    const {email , password} = req.body;
+    try {
+        const existingUser = await User.findOne({email})
+        if(!existingUser){
+            return res.status(400).json({
+                message: "Invalid email or password"
+            })
+        }
+        const isPassword = await bcrypt.compare(password , existingUser.password);
+        if(!isPassword){
+            return res.status(401).json({
+                message: "Invalid email or password"
+            })
+        }
+        //Generating token
+        const token = jwt.sign(
+            {userId: existingUser._id},
+            process.env.JWT_SECRET,
+            {expiresIn: "7d"}
+        )
+        //Adding token to cookie
+        res.cookie("token" , token, {
+            httpOnly: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+        res.status(200).json({
+            message: "Logged in successfully"
+        })
+    }
+    catch(error){
+        console.log(error)
+        res.status(500).json({
+            message: "Some error occured"
         })
     }
 }
