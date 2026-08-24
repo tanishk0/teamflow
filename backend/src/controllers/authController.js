@@ -1,11 +1,23 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../db/User";
+import { validateEmail , validatePassword } from "../../../shared/validation";
+
 
 
 export async function signup(req, res) {
-    //signup logic
+    //destruct fields
     const { name , email , password } = req.body;
+    //backen validation for email and password
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+
+    if (emailError || passwordError) {
+        return res.status(400).json({
+            message: emailError || passwordError
+        });
+    }
+    //signup logic
     try {
         const alreadyUser = await User.findOne({ email })
         if(alreadyUser){
