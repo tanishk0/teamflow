@@ -1,6 +1,18 @@
 import express from "express"
 import dotenv from "dotenv"
 import cors from "cors"
+import mongoose from "mongoose"
+
+const connectDB = async () => {
+    try {
+        await mongoose.connect(process.env.MONGODB_URI)
+        console.log("MongoDB Connected Successfully")
+    }
+    catch (error) {
+        console.error("MongoDB Connection Failed" , error.message);
+        process.exit(1);
+    }
+}
 
 dotenv.config();
 
@@ -15,6 +27,8 @@ app.get("/" , (req , res)=> {
 
 const PORT = process.env.PORT
 
-app.listen(PORT , ()=> {
-    console.log("server is runnign on port 3000")
-})
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+});
