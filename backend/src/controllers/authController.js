@@ -1,22 +1,22 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../db/User";
-import { validateEmail , validatePassword } from "../../../shared/validation";
-
+import User from "../db/User.js";
+import { validateEmail , validatePassword } from "../../../shared/validation.js";
 
 
 export async function signup(req, res) {
     //destruct fields
     const { name , email , password } = req.body;
-    //backen validation for email and password
+
+    //backend validation for email and password
     const emailError = validateEmail(email);
     const passwordError = validatePassword(password);
-
     if (emailError || passwordError) {
         return res.status(400).json({
             message: emailError || passwordError
         });
     }
+
     //signup logic
     try {
         const alreadyUser = await User.findOne({ email })
@@ -102,4 +102,9 @@ export async function signin(req, res){
             message: "Some error occured"
         })
     }
+}
+
+export async function logout(req, res){
+    res.clearCookie("token");
+    res.json({ message: "Logged out successfully" });
 }
