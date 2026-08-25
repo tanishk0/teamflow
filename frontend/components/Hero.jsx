@@ -1,5 +1,6 @@
 import Button from "./Button";
 import demo from "../src/assets/demo.png";
+import { Link } from "react-router-dom";
 export default function Hero() {
   return (
     <div className="p-8 w-full flex flex-col items-center justify-around bg-none">
@@ -17,7 +18,9 @@ export default function Hero() {
           one place.
         </p>
       </div>
-      <Button text="Get Started" />
+      <Link to="/signup">
+        <Button text="Get Started" />
+      </Link>
       <div className="mt-8">
         <img
           src={demo}

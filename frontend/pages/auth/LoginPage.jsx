@@ -1,13 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link , useNavigate} from "react-router-dom";
 import EmailInput from "../../components/Auth/Email";
 import PasswordInput from "../../components/Auth/Password";
 import Button from "../../components/Button";
-import { validateEmail, validateLoginPassword } from "../../src/utils/validation";
+import {
+  validateEmail,
+  validateLoginPassword,
+} from "../../../shared/validation";
 import { useState } from "react";
+import api from "../../src/api/axios";
+
 
 export default function LoginPage() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const [touched, setTouched] = useState({
     email: false,
@@ -17,7 +24,7 @@ export default function LoginPage() {
   const emailError = validateEmail(email);
   const passwordError = validateLoginPassword(password);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     // Mark everything as touched when submitting
@@ -30,18 +37,22 @@ export default function LoginPage() {
     if (emailError || passwordError) {
       return;
     }
-
-    // API request will go here
-    console.log({
-      email,
-      password,
-    });
+    //API calling
+    try {
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
+      navigate("/dashboard")
+    } catch (error) {
+      setError(error.response?.data?.message || "Something went wrong")
+    }
   }
   return (
     <section className="h-screen w-screen flex items-center justify-center bg-background">
       <div className="w-100 h-140 pt-8 bg-white shadow-md">
         <div className="flex flex-col gap-1 items-center justify-center mb-4">
-          <h2 className="text-xl font-semibold">Create your account</h2>
+          <h2 className="text-xl font-semibold">Welcome back</h2>
           <p className="text-xs">
             <span className="text-text-secondary">Don't have an account? </span>
             <Link className="text-primary underline font-semibold" to="/signup">
@@ -49,7 +60,10 @@ export default function LoginPage() {
             </Link>{" "}
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="w-full h-full flex flex-col gap-4 items-center p-8">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full h-full flex flex-col gap-4 items-center p-8"
+        >
           <EmailInput
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -80,6 +94,7 @@ export default function LoginPage() {
             className="mt-2 w-full text-sm"
             type="submit"
           ></Button>
+          {error && <p className="text-sm text-red-500">{error}</p>}
         </form>
       </div>
     </section>
