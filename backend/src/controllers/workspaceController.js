@@ -48,3 +48,29 @@ export async function getWorkspaces(req , res){
         });
     }
 }
+
+export async function renameWorkspace(req , res){
+    const {name} = req.body;
+    try{
+        const workspace = await Workspace.findByIdAndUpdate(
+            req.params.id,
+            {name},
+            {new:true}
+        )
+
+        if(!workspace){
+            return res.status(404).json({
+                message: "Workspace not found"
+            })
+        }
+        res.status(200).json({
+            message:"Workspace renamed successfully"
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to rename workspace",
+            error: error.message
+        })
+    }
+}
