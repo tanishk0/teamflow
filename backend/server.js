@@ -3,6 +3,8 @@ import dotenv from "dotenv"
 import cors from "cors"
 import mongoose from "mongoose"
 import authRoutes from "./src/routes/authRoute.js"
+import workspaceRoutes from "./src/routes/workspaceRoute.js"
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express()
@@ -13,9 +15,15 @@ app.use(cors({
 }));
 
 app.use(express.json())
+app.use(cookieParser());
+
+//
 
 app.use("/api/auth", authRoutes);
+app.use("/api/workspaces", workspaceRoutes)
 
+
+// base req
 app.get("/" , (req , res)=> {
     res.json({message: "Teamflow API running"})
 })
