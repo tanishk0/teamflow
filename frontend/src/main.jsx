@@ -1,12 +1,16 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Route } from "react-router-dom";
 
 import "./index.css";
 import App from "./App.jsx";
 import LoginPage from "../pages/auth/LoginPage.jsx";
 import SignupPage from "../pages/auth/SignupPage.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
+import Workspace from "../pages/Workspace.jsx";
+import Invitations from "../pages/Invitations.jsx"
+import Teams from "../pages/Teams.jsx";
 
 const router = createBrowserRouter([
   {
@@ -23,7 +27,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <Dashboard />
+    element: <Dashboard />,
+  },
+  {
+    path: "/workspaces",
+    element: <Workspace />,
+  },
+  {
+    path: '/invitations',
+    element: <Invitations />
+  },
+  {
+    path: '/teams',
+    element: <Teams />
   }
 ]);
 
