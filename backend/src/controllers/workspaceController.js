@@ -28,3 +28,23 @@ export async function createWorkspace(req , res){
         })
     }
 }
+
+export async function getWorkspaces(req , res){
+    try{
+        const members = await WorkspaceMember
+            .find({
+                userId: req.userId,
+                status: "active"
+            })
+            .populate("workspaceId");
+
+        res.status(200).json({
+            workspaces: members
+        });
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to fetch workspaces"
+        });
+    }
+}
