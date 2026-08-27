@@ -41,3 +41,7 @@
   --color-info: #0284C7;
   --color-info-light: #E0F2FE;
 }
+body {
+  margin: 0;
+  background-color: var(--color-background);
+}
