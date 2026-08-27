@@ -74,3 +74,26 @@ export async function renameWorkspace(req , res){
         })
     }
 }
+
+export async function deleteWorkspace(){
+    try{
+        const workspace = await Workspace.findByIdAndDelete(req.params.id)
+
+        if(!workspace){
+            return res.status(404).json({
+                message: "Workspace not found"
+            })
+        }
+
+        res.status(200).json({
+            message: "Workspace deleted successfully"
+        }
+    )
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to delete workspace",
+            error: error.message
+        })
+    }
+}
