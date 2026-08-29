@@ -1,15 +1,57 @@
+import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar.jsx";
-
+import api from "../src/api/axios.js";
+import Button from "../components/Button.jsx";
+import WorkspaceModal from "../components/modals/AddWorkspaceModal.jsx";
 export default function Workspace() {
+  const [showModal, setShowModal] = useState(false);
+  const [workspaces, setWorkspaces] = useState([]);
   const items = [
     { label: "Overview", path: "/dashboard" },
     { label: "Workspaces", path: "/workspaces" },
     { label: "Invitations", path: "/invitations" },
     { label: "Teams", path: "/teams" },
   ];
+  
   return (
     <div className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
-    </div>  
+      <div className="p-4 flex flex-col w-full">
+        <div className="w-full p-2 flex justify-between">
+          <h2 className="text-3xl font-semibold">Your workspaces</h2>
+          <Button
+            text="Add workspace"
+            onClick={() => setShowModal(true)}
+          ></Button>
+        </div>
+        <div className="flex flex-col gap-1 mt-4 h-full">
+          {workspaces.length === 0 ? (
+            <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
+              <p>You don't have any workspaces</p>
+              <Button
+                text="Add workspace"
+                onClick={() => setShowModal(true)}
+              ></Button>
+            </div>
+          ) : (
+            workspaces.slice(0, 3).map((workspace) => (
+              <div
+                key={workspace._id}
+                className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              >
+                <h3 className="text-lg font-semibold">{workspace.name}</h3>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {showModal && (
+        <WorkspaceModal
+          onClose={() => setShowModal(false)}
+          onCreate={handleCreateWorkspace}
+        />
+      )}
+    </div>
   );
 }
