@@ -37,9 +37,10 @@ export async function getWorkspaces(req , res){
                 status: "active"
             })
             .populate("workspaceId");
+        const workspaces = members.map((member) => member.workspaceId);
 
         res.status(200).json({
-            workspaces: members
+            workspaces
         });
     }
     catch(error){
