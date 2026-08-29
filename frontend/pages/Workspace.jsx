@@ -12,7 +12,33 @@ export default function Workspace() {
     { label: "Invitations", path: "/invitations" },
     { label: "Teams", path: "/teams" },
   ];
-  
+  useEffect(() => {
+    async function fetchWorkspaces() {
+      try {
+        const response = await api.get("/workspaces");
+
+        setWorkspaces(response.data.workspaces || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchWorkspaces();
+  }, []);
+  async function handleCreateWorkspace(name) {
+    try {
+      const response = await api.post("/workspaces", {
+        name,
+      });
+      const workspace = response.data.workspace;
+      //Add newly added workspace to ui
+      setWorkspaces((prevWorkspaces) => [...prevWorkspaces, workspace]);
+      // Close the modal
+      setShowModal(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   return (
     <div className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
