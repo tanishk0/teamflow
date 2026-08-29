@@ -19,7 +19,7 @@ export default function Dashboard() {
       try {
         const response = await api.get("/workspaces");
 
-        setWorkspaces(response.data.workspaces);
+        setWorkspaces(response.data.workspaces || []);
       } catch (error) {
         console.error(error);
       }
@@ -56,18 +56,22 @@ export default function Dashboard() {
           ></Button>
         </div>
 
-        <div className="flex flex-col gap-1 mt-4">
+        <div className="flex flex-col gap-1 mt-4 h-full">
           {workspaces.length === 0 ? (
-            <Button text="Add workspace" />
+            <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
+              <p>You don't have any workspaces</p>
+              <Button
+                text="Add workspace"
+                onClick={() => setShowModal(true)}
+              ></Button>
+            </div>
           ) : (
             workspaces.slice(0, 3).map((workspace) => (
               <div
                 key={workspace._id}
                 className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
               >
-                <h3 className="text-lg font-semibold">
-                  {workspace.workspaceId.name}
-                </h3>
+                <h3 className="text-lg font-semibold">{workspace.name}</h3>
               </div>
             ))
           )}
