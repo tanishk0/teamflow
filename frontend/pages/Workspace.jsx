@@ -10,6 +10,6 @@ export default function Workspace() {
   return (
     <div className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
-    </div>
+    </div>  
   );
 }
