@@ -60,7 +60,7 @@ export default function Workspace() {
               ></Button>
             </div>
           ) : (
-            workspaces.slice(0, 3).map((workspace) => (
+            workspaces.map((workspace) => (
               <div
                 key={workspace._id}
                 className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
