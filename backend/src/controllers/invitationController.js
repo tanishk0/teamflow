@@ -1,8 +1,30 @@
 import Workspace from "../db/Workspace.js";
 
-import WorkspaceMember from "../db/WorkspaceMember";
+import WorkspaceMember from "../db/WorkspaceMember.js";
 import User from "../db/User.js";
 import Invitation from "../db/Invitation.js"
+
+export async function getInvites(req, res){
+    try{
+        const user = await User.findById(req.userId)
+        const invitations = await Invitation.find({
+            email: user.email,
+            status: "pending",
+        });
+
+        res.status(200).json({
+            message: "Invitations fetched successfully"
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to fetch invites",
+            error: error.message,
+        })
+    }
+}
+
+
 
 export async function createInvite(req, res){
     const { email } = req.body;
