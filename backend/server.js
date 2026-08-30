@@ -4,6 +4,7 @@ import cors from "cors"
 import mongoose from "mongoose"
 import authRoutes from "./src/routes/authRoute.js"
 import workspaceRoutes from "./src/routes/workspaceRoute.js"
+import invitationRoutes from "./src/routes/invitationRoute.js"
 import cookieParser from "cookie-parser";
 dotenv.config();
 
@@ -20,7 +21,8 @@ app.use(cookieParser());
 //
 
 app.use("/api/auth", authRoutes);
-app.use("/api/workspaces", workspaceRoutes)
+app.use("/api/workspaces", workspaceRoutes);
+app.use("/api/invitations", invitationRoutes);
 
 
 // base req
