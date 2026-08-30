@@ -11,6 +11,7 @@ import Dashboard from "../pages/Dashboard.jsx";
 import Workspace from "../pages/Workspace.jsx";
 import Invitations from "../pages/Invitations.jsx"
 import Teams from "../pages/Teams.jsx";
+import WorkspaceDetail from "../pages/WorkspaceDetail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
   {
     path: '/teams',
     element: <Teams />
+  },
+  {
+    path: '/workspace/:id',
+    element: <WorkspaceDetail />
   }
 ]);
 
