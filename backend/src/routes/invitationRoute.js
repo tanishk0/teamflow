@@ -4,9 +4,12 @@ import { requireAuth } from "../middleware/authMiddleware.js"
 
 const router = express.Router();
 
-router.post('/', requireAuth, createInvite);
-router.patch('/', requireAuth, acceptInvite);
-router.patch('/', requireAuth, rejectInvite);
-router.get('/', requireAuth, getInvites);
+router.post("/workspaces/:workspaceId", requireAuth, createInvite);
+
+router.patch("/:id/accept", requireAuth, acceptInvite);
+
+router.patch("/:id/reject", requireAuth, rejectInvite);
+
+router.get("/", requireAuth, getInvites);
 
 export default router;
