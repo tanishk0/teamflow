@@ -81,10 +81,14 @@ export async function acceptInvite(req, res){
             })
         }
 
-        await Invitation.updateOne(
-            {id: _id},
-            {status : "accepted"}
-        )
+        if (invitation.status !== "pending") {
+            return res.status(400).json({
+                message: "Invitation is no longer pending"
+            });
+        }
+        invitation.status = "accepted";
+        await invitation.save();
+        
         await WorkspaceMember.updateOne(
             {
                 workspaceId: invitation.workspaceId,
@@ -92,6 +96,9 @@ export async function acceptInvite(req, res){
             },
             {status : "active"}
         )
+        res.status(200).json({
+            message: "Invite accepted"
+        })
     }
     catch(error){
         res.status(500).json({
