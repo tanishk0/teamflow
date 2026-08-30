@@ -107,3 +107,49 @@ export async function acceptInvite(req, res){
         })
     }
 }
+
+export async function rejectInvite(req ,res){
+    const {id} = req.params;
+    try{
+        const invitation = await Invitation.findById(id);
+        if(!invitation){
+            return res.status(404).json({
+                message: "Invite does not exist"
+            })
+        }
+
+        //find the invite belongs to the user
+        const user = await User.findById(req.userId);
+        if(invitation.email !== user.email){
+            return res.status(403).json({
+                message: "This invitation does not belong to you"
+            })
+        }
+
+        if (invitation.status !== "pending") {
+            return res.status(400).json({
+                message: "Invitation is no longer pending"
+            });
+        }
+
+        //update invitation and member models
+        invitation.status = "rejected";
+        await invitation.save();
+
+        await WorkspaceMember.deleteOne(
+            {
+                workspaceId: invitation.workspaceId,
+                userId: req.userId,
+            }
+        )
+        res.status(200).json({
+            message: "Invite rejected successfully"
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to reject invitation",
+            error: error.message,
+        })
+    }
+}
