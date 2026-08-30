@@ -4,7 +4,7 @@ import WorkspaceMember from "../db/WorkspaceMember";
 import User from "../db/User.js";
 import Invitation from "../db/Invitation.js"
 
-export async function createInvite(){
+export async function createInvite(req, res){
     const { email } = req.body;
     const { id: workspaceId } = req.params;
     try{
@@ -60,5 +60,43 @@ export async function createInvite(){
             message: "Failed to sent an invite",
             error: error.message,
         });
+    }
+}
+
+export async function acceptInvite(req, res){
+    const { id } = req.params;
+    try{
+        const invitation = await Invitation.findById(id);
+        if(!invitation){
+            return res.status(404).json({
+                message: "Invitation not found"
+            });
+        }
+
+        //find the invite belongs to the user
+        const user = await User.findById(req.userId);
+        if(invitation.email !== user.email){
+            return res.status(403).json({
+                message: "This invitation does not belong to you"
+            })
+        }
+
+        await Invitation.updateOne(
+            {id: _id},
+            {status : "accepted"}
+        )
+        await WorkspaceMember.updateOne(
+            {
+                workspaceId: invitation.workspaceId,
+                userId: req.userId
+            },
+            {status : "active"}
+        )
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to accept the invite",
+            error: error.message,
+        })
     }
 }
