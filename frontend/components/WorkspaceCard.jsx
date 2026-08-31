@@ -9,12 +9,13 @@ export default function WorkspaceCard({ workspace, onRename, onDelete }) {
     <div className="w-full h-16 text-md flex justify-between items-center px-8 bg-white rounded-md shadow-sm my-1">
       {isEditing ? (
         <input
+          className="border"
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => {
+          onKeyDown={async (e) => {
             if (e.key === "Enter") {
-              onRename(workspace._id, name);
+              await onRename(workspace._id, name);
               setIsEditing(false);
             }
           }}
