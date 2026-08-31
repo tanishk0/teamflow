@@ -44,6 +44,36 @@ export default function Dashboard() {
       console.log(error);
     }
   }
+  // handle delete
+  async function handleDeleteWorkspace(id) {
+    try {
+      await api.delete(`/workspaces/${id}`);
+
+      setWorkspaces((prevWorkspaces) =>
+        prevWorkspaces.filter((workspace) => workspace._id !== id),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  //handle name
+  async function handleRenameWorkspace(id, name) {
+    try {
+      const response = await api.patch(`/workspaces/${id}`, {
+        name,
+      });
+
+      const updatedWorkspace = response.data.workspace;
+
+      setWorkspaces((prevWorkspaces) =>
+        prevWorkspaces.map((workspace) =>
+          workspace._id === id ? updatedWorkspace : workspace,
+        ),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return (
     <div className="flex min-h-screen">
       <Sidebar items={items} />
@@ -70,7 +100,12 @@ export default function Dashboard() {
             workspaces
               .slice(0, 3)
               .map((workspace) => (
-                <WorkspaceCard key={workspace._id} workspace={workspace} />
+                <WorkspaceCard
+                  key={workspace._id}
+                  workspace={workspace}
+                  onRename={handleRenameWorkspace}
+                  onDelete={handleDeleteWorkspace}
+                />
               ))
           )}
         </div>
