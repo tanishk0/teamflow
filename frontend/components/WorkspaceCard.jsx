@@ -2,6 +2,7 @@ import { MoreVertical } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
 import { useState } from "react";
 
+
 export default function WorkspaceCard({ workspace, onRename, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(workspace.name);
@@ -21,7 +22,7 @@ export default function WorkspaceCard({ workspace, onRename, onDelete }) {
           }}
         />
       ) : (
-        <p>{workspace.name}</p>
+        <p className="text-md text-color-primary hover:underline cursor-pointer">{workspace.name}</p>
       )}
 
       <DropdownMenu.Root>
