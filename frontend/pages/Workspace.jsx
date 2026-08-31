@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar.jsx";
 import api from "../src/api/axios.js";
 import Button from "../components/Button.jsx";
 import WorkspaceModal from "../components/modals/AddWorkspaceModal.jsx";
+import WorkspaceCard from "../components/WorkspaceCard.jsx";
 import { useNavigate } from "react-router-dom";
 export default function Workspace() {
   const [showModal, setShowModal] = useState(false);
@@ -63,13 +64,7 @@ export default function Workspace() {
             </div>
           ) : (
             workspaces.map((workspace) => (
-              <div
-                key={workspace._id}
-                onClick={() => navigate(`/workspace/${workspace._id}`)}
-                className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-lg font-semibold">{workspace.name}</h3>
-              </div>
+              <WorkspaceCard key={workspace._id} workspace={workspace} />
             ))
           )}
         </div>

@@ -3,6 +3,7 @@ import Sidebar from "../components/Sidebar.jsx";
 import api from "../src/api/axios.js";
 import Button from "../components/Button.jsx";
 import WorkspaceModal from "../components/modals/AddWorkspaceModal.jsx";
+import WorkspaceCard from "../components/WorkspaceCard.jsx";
 export default function Dashboard() {
   const [workspaces, setWorkspaces] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -66,14 +67,11 @@ export default function Dashboard() {
               ></Button>
             </div>
           ) : (
-            workspaces.slice(0, 3).map((workspace) => (
-              <div
-                key={workspace._id}
-                className="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-lg font-semibold">{workspace.name}</h3>
-              </div>
-            ))
+            workspaces
+              .slice(0, 3)
+              .map((workspace) => (
+                <WorkspaceCard key={workspace._id} workspace={workspace} />
+              ))
           )}
         </div>
       </div>
