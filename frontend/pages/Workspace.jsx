@@ -57,15 +57,11 @@ export default function Workspace() {
   //handle rename
   async function handleRenameWorkspace(id, name) {
     try {
-      const response = await api.patch(`/workspaces/${id}`, {
-        name,
-      });
+      await api.patch(`/workspaces/${id}`, { name });
 
-      const updatedWorkspace = response.data.workspace;
-
-      setWorkspaces((prevWorkspaces) =>
-        prevWorkspaces.map((workspace) =>
-          workspace._id === id ? updatedWorkspace : workspace,
+      setWorkspaces((prev) =>
+        prev.map((workspace) =>
+          workspace._id === id ? { ...workspace, name } : workspace,
         ),
       );
     } catch (error) {
