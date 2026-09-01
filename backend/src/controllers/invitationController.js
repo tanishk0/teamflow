@@ -37,7 +37,7 @@ export async function createInvite(req, res){
             });
         }
         // 2. Find invited user
-        const user = await User.findOne({email});
+        const user = await User.findOne({email: email.toLowerCase().trim(),});
 
         if(!user){
             return res.status(404).json({
