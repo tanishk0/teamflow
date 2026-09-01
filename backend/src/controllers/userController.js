@@ -4,11 +4,11 @@ import { validateEmail } from "../../../shared/validation.js";
 export async function checkUserExists(req, res) {
   const { email } = req.query;
 
-  if (!email) {
+  if (!email || !validateEmail(email)) {
     return res.status(400).json({
-      message: "Email is required",
-    });
-  }
+        message: "Invalid email",
+        });
+    }
 
   try {
     const user = await User.findOne({
