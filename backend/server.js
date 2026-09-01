@@ -6,6 +6,7 @@ import authRoutes from "./src/routes/authRoute.js"
 import workspaceRoutes from "./src/routes/workspaceRoute.js"
 import invitationRoutes from "./src/routes/invitationRoute.js"
 import cookieParser from "cookie-parser";
+import userRoutes from "./src/routes/userRoute.js"
 dotenv.config();
 
 const app = express()
@@ -23,6 +24,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/invitations", invitationRoutes);
+app.use("/api/users", userRoutes);
 
 
 // base req
