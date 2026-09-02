@@ -8,6 +8,7 @@ export default function WorkspaceModal({ onClose, onCreate }) {
   const [role, setRole] = useState("member");
   const [members, setMembers] = useState([]);
   const [emailError, setEmailError] = useState("");
+  const [nameError, setNameError] = useState("");
 
   async function addMember() {
     const cleanedEmail = email.trim().toLowerCase();
@@ -62,8 +63,11 @@ export default function WorkspaceModal({ onClose, onCreate }) {
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (!name.trim()) return;
-
+    if (!name.trim()) {
+      setNameError("Workspace name cannot be empty");
+      return;
+    };
+    setNameError("");
     onCreate(name, members);
   }
 
