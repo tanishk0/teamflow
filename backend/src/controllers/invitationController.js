@@ -27,7 +27,12 @@ export async function getInvites(req, res){
 
 
 export async function createInvite(req, res){
-    const { email } = req.body;
+    const { email, role } = req.body;
+    if (!["manager", "member"].includes(role)) {
+        return res.status(400).json({
+        message: "Invalid role",
+        });
+    }
     const { id: workspaceId } = req.params;
     try{
         const workspace = await Workspace.findById(workspaceId);
@@ -60,6 +65,7 @@ export async function createInvite(req, res){
             workspaceId,
             inviterId: req.userId,
             email,
+            role,
             status: "pending",
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         })
@@ -68,7 +74,7 @@ export async function createInvite(req, res){
         await WorkspaceMember.create({
             workspaceId,
             userId: user._id,
-            role: "member",
+            role,
             status: "invited"
         })
 

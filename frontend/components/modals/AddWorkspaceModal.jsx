@@ -66,7 +66,7 @@ export default function WorkspaceModal({ onClose, onCreate }) {
     if (!name.trim()) {
       setNameError("Workspace name cannot be empty");
       return;
-    };
+    }
     setNameError("");
     onCreate(name, members);
   }
@@ -84,11 +84,15 @@ export default function WorkspaceModal({ onClose, onCreate }) {
               type="text"
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value);
+                setNameError("");
+              }}
               placeholder="Enter workspace name"
               className="border rounded-lg p-3"
             />
           </div>
+          {nameError && <p className="text-sm text-red-500">{nameError}</p>}
 
           {/* Invite members */}
           <div className="flex flex-col gap-3">
