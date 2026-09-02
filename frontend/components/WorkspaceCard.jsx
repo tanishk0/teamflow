@@ -1,11 +1,13 @@
 import { MoreVertical } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
+import { use } from "react";
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 export default function WorkspaceCard({ workspace, onRename, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(workspace.name);
+  const navigate = useNavigate();
   return (
     <div className="w-full h-16 text-md flex justify-between items-center px-8 bg-white rounded-md shadow-sm my-1">
       {isEditing ? (
@@ -22,7 +24,12 @@ export default function WorkspaceCard({ workspace, onRename, onDelete }) {
           }}
         />
       ) : (
-        <p className="text-md text-color-primary hover:underline cursor-pointer">{workspace.name}</p>
+        <p
+          onClick={() => navigate(`/workspace/${workspace._id}`)}
+          className="text-md hover:text-primary hover:underline cursor-pointer"
+        >
+          {workspace.name}
+        </p>
       )}
 
       <DropdownMenu.Root>

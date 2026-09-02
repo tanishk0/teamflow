@@ -38,7 +38,7 @@ export default function InviteMembersModal({ onClose, onInvite }) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-lg p-6 w-full max-w-md"
+       className="bg-white rounded-lg p-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-5">
