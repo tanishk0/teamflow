@@ -1,14 +1,15 @@
-import User from "../models/User.js";
+import User from "../db/User.js"
 import { validateEmail } from "../../../shared/validation.js";
 
 export async function checkUserExists(req, res) {
   const { email } = req.query;
+  const emailError = validateEmail(email);
 
-  if (!email || !validateEmail(email)) {
+  if (emailError) {
     return res.status(400).json({
-        message: "Invalid email",
-        });
-    }
+      message: emailError,
+    });
+  }
 
   try {
     const user = await User.findOne({
