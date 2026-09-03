@@ -1,7 +1,7 @@
 import api from "../api/axios.js"
 
-export async function getWorkspace(){
-    const response = await api.get('/workspace');
+export async function getWorkspaces(){
+    const response = await api.get('/workspaces');
     return response.data.workspaces;
 }
 
