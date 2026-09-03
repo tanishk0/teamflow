@@ -24,6 +24,24 @@ export async function getInvites(req, res){
     }
 }
 
+export async function getWorkspaceInvites(req, res) {
+  const { workspaceId } = req.params;
+
+  try {
+    const invitations = await Invitation.find({ workspaceId })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      invitations,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch workspace invitations",
+      error: error.message,
+    });
+  }
+}
+
 export async function createInvite(req, res){
     const { email, role } = req.body;
     if (!["manager", "member"].includes(role)) {
