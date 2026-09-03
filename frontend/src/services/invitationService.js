@@ -33,3 +33,12 @@ export async function acceptInvitation(invitationId) {
 
   return response.data;
 }
+
+// Reject
+export async function rejectInvitation(invitationId) {
+  const response = await api.patch(
+    `/invitations/${invitationId}/reject`,
+  );
+
+  return response.data;
+}
