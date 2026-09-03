@@ -30,12 +30,16 @@ export default function Dashboard() {
   }, []);
 
   //Create workspace through add workspace button
-  async function handleCreateWorkspace(name) {
+  async function handleCreateWorkspace(name, members) {
     try {
       const response = await api.post("/workspaces", {
         name,
       });
       const workspace = response.data.workspace;
+      //Send invites
+      for (const member of members) {
+        await api.post(`/workspaces/${workspace._id}/invitations`, member);
+      }
       //Add newly added workspace to ui
       setWorkspaces((prevWorkspaces) => [...prevWorkspaces, workspace]);
       // Close the modal

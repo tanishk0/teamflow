@@ -19,7 +19,6 @@ export default function Workspace() {
     async function fetchWorkspaces() {
       try {
         const response = await api.get("/workspaces");
-
         setWorkspaces(response.data.workspaces || []);
       } catch (error) {
         console.error(error);
