@@ -1,6 +1,10 @@
 import express from "express"
 import { createWorkspace, deleteWorkspace, getWorkspaces, renameWorkspace } from "../controllers/workspaceController.js"
 import { requireAuth } from "../middleware/authMiddleware.js";
+import {
+  createInvite,
+  getWorkspaceInvites,
+} from "../controllers/invitationController.js";
 
 const router = express.Router();
 
