@@ -14,3 +14,13 @@ export async function getWorkspaceInvitations(workspaceId) {
 
   return response.data.invitations;
 }
+
+// Send invite
+export async function createInvitation(workspaceId, member) {
+  const response = await api.post(
+    `/workspaces/${workspaceId}/invitations`,
+    member,
+  );
+
+  return response.data.invitation;
+}
