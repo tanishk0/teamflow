@@ -24,3 +24,12 @@ export async function createInvitation(workspaceId, member) {
 
   return response.data.invitation;
 }
+
+// Accept
+export async function acceptInvitation(invitationId) {
+  const response = await api.patch(
+    `/invitations/${invitationId}/accept`,
+  );
+
+  return response.data;
+}
