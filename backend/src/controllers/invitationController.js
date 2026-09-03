@@ -33,7 +33,7 @@ export async function createInvite(req, res){
         message: "Invalid role",
         });
     }
-    const { id: workspaceId } = req.params;
+    const { workspaceId } = req.params;
     try{
         const workspace = await Workspace.findById(workspaceId);
         if(!workspace){
