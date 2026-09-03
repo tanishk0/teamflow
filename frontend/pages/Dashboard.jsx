@@ -1,6 +1,13 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar.jsx";
-import api from "../src/api/axios.js";
+import {
+  getWorkspaces,
+  createWorkspace,
+  renameWorkspace,
+  deleteWorkspace,
+} from "../src/services/workspaceService.js";
+import { createInvitation } from "../src/services/invitationService.js";
+
 import Button from "../components/Button.jsx";
 import WorkspaceModal from "../components/modals/AddWorkspaceModal.jsx";
 import WorkspaceCard from "../components/WorkspaceCard.jsx";
@@ -18,9 +25,8 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchWorkspaces() {
       try {
-        const response = await api.get("/workspaces");
-
-        setWorkspaces(response.data.workspaces || []);
+        const workspaces = await getWorkspaces();
+        setWorkspaces(workspaces || []);
       } catch (error) {
         console.error(error);
       }
@@ -32,30 +38,24 @@ export default function Dashboard() {
   //Create workspace through add workspace button
   async function handleCreateWorkspace(name, members) {
     try {
-      const response = await api.post("/workspaces", {
-        name,
-      });
-      const workspace = response.data.workspace;
-      //Send invites
+      const workspace = await createWorkspace(name);
+
       for (const member of members) {
-        await api.post(`/workspaces/${workspace._id}/invitations`, member);
+        await createInvitation(workspace._id, member);
       }
-      //Add newly added workspace to ui
-      setWorkspaces((prevWorkspaces) => [...prevWorkspaces, workspace]);
-      // Close the modal
+
+      setWorkspaces((prev) => [...prev, workspace]);
       setShowModal(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
   // handle delete
   async function handleDeleteWorkspace(id) {
     try {
-      await api.delete(`/workspaces/${id}`);
+      await deleteWorkspace(id);
 
-      setWorkspaces((prevWorkspaces) =>
-        prevWorkspaces.filter((workspace) => workspace._id !== id),
-      );
+      setWorkspaces((prev) => prev.filter((workspace) => workspace._id !== id));
     } catch (error) {
       console.error(error);
     }
@@ -63,7 +63,7 @@ export default function Dashboard() {
   //handle name
   async function handleRenameWorkspace(id, name) {
     try {
-      await api.patch(`/workspaces/${id}`, { name });
+      await renameWorkspace(id, name);
 
       setWorkspaces((prev) =>
         prev.map((workspace) =>

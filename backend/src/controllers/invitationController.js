@@ -24,8 +24,6 @@ export async function getInvites(req, res){
     }
 }
 
-
-
 export async function createInvite(req, res){
     const { email, role } = req.body;
     if (!["manager", "member"].includes(role)) {
