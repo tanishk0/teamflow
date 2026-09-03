@@ -15,3 +15,6 @@ export async function renameWorkspace(id, name) {
   return response.data.workspace;
 }
 
+export async function deleteWorkspace(id) {
+  await api.delete(`/workspaces/${id}`);
+}
