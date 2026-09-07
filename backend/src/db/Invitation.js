@@ -27,12 +27,6 @@ const InvitationModel = new mongoose.Schema(
             required: true
         },
 
-        token: {
-            type: String,
-            required: true,
-            unique: true
-        },
-
         status: {
             type: String,
             enum: ["pending", "accepted", "expired"],
