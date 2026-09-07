@@ -4,23 +4,31 @@ import WorkspaceMember from "../db/WorkspaceMember.js";
 import User from "../db/User.js";
 import Invitation from "../db/Invitation.js"
 
-export async function getInvites(req, res){
-    try{
-        const user = await User.findById(req.userId)
+export async function getInvites(req, res) {
+    try {
+        const user = await User.findById(req.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
         const invitations = await Invitation.find({
             email: user.email,
             status: "pending",
         });
 
-        res.status(200).json({
-            message: "Invitations fetched successfully"
-        })
+        return res.status(200).json({
+            message: "Invitations fetched successfully",
+            invitations,
+        });
     }
-    catch(error){
-        res.status(500).json({
+    catch (error) {
+        return res.status(500).json({
             message: "Failed to fetch invites",
             error: error.message,
-        })
+        });
     }
 }
 
