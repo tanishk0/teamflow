@@ -17,7 +17,9 @@ export async function getInvites(req, res) {
         const invitations = await Invitation.find({
             email: user.email,
             status: "pending",
-        });
+        })
+        .populate("workspaceId", "name")
+        .populate("inviterId", "name email");
 
         return res.status(200).json({
             message: "Invitations fetched successfully",
@@ -31,7 +33,6 @@ export async function getInvites(req, res) {
         });
     }
 }
-
 export async function getWorkspaceInvites(req, res) {
   const { workspaceId } = req.params;
 
