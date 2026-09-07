@@ -41,6 +41,8 @@ export default function Dashboard() {
       const workspace = await createWorkspace(name);
 
       for (const member of members) {
+        console.log("MEMBERS:", members);
+        console.log("MEMBER:", member);
         await createInvitation(workspace._id, member);
       }
 
