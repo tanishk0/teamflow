@@ -78,8 +78,8 @@ export async function renameWorkspace(req , res){
 
 export async function deleteWorkspace(req,res){
     try{
+        const { id } = req.params;
         const workspace = await Workspace.findByIdAndDelete(req.params.id)
-        
         
         if(!workspace){
             return res.status(404).json({
@@ -88,6 +88,10 @@ export async function deleteWorkspace(req,res){
         }
         await WorkspaceMember.deleteMany({
             workspaceId: req.params.id
+        });
+
+        await Invitation.deleteMany({
+            workspaceId: id,
         });
         res.status(200).json({
             message: "Workspace deleted successfully"
