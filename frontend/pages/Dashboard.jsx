@@ -6,6 +6,7 @@ import {
   renameWorkspace,
   deleteWorkspace,
 } from "../src/services/workspaceService.js";
+import api from "../src/api/axios.js";
 import { createInvitation } from "../src/services/invitationService.js";
 
 import Button from "../components/Button.jsx";
@@ -14,6 +15,14 @@ import WorkspaceCard from "../components/WorkspaceCard.jsx";
 export default function Dashboard() {
   const [workspaces, setWorkspaces] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    api
+      .get("/auth/me")
+      .then((res) => setUser(res.data.user))
+      .catch(console.error);
+  }, []);
 
   const items = [
     { label: "Overview", path: "/dashboard" },
@@ -82,7 +91,10 @@ export default function Dashboard() {
 
       <div className="p-4 flex flex-col w-full">
         <div className="w-full p-2 flex justify-between">
-          <h2 className="text-3xl font-semibold">Dashboard</h2>
+          <div className="flex flex-col">
+            <h2 className="text-3xl font-semibold">Dashboard</h2>
+            <p>Welcome back, {user?.name}</p>
+          </div>
           <Button
             text="Add workspace"
             onClick={() => setShowModal(true)}
