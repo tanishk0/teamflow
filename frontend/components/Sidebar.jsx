@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 export default function Sidebar({ items }) {
   return (
-    <aside className="flex flex-col w-[16%] px-4 py-4 bg-white">
+    <aside className="flex flex-col w-64 shrink-0 px-4 py-4 bg-white">
       <div className="text-primary text-2xl">
         <span className="font-sans font-semibold text-text-primary">Team</span>
         <span className="font-serif italic">Flow</span>
