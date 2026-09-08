@@ -6,9 +6,19 @@ import {
   rejectInvitation,
 } from "../src/services/invitationService.js";
 
+import Sidebar from "../components/Sidebar.jsx";
+
 export default function Invitations() {
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  //Sidebar
+  const items = [
+    { label: "Overview", path: "/dashboard" },
+    { label: "Workspaces", path: "/workspaces" },
+    { label: "Invitations", path: "/invitations" },
+    { label: "Teams", path: "/teams" },
+  ];
 
   useEffect(() => {
     async function fetchInvitations() {
@@ -46,8 +56,9 @@ export default function Invitations() {
   }
 
   return (
-    <section className="min-h-screen w-full bg-red-200 p-8">
+    <section className="min-h-screen w-full bg-red-200">
       <div>
+        <Sidebar items={items} />
         <h2 className="text-3xl font-semibold">Your invitations</h2>
 
         <div className="mt-6 space-y-4">
