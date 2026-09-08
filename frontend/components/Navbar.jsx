@@ -14,20 +14,14 @@ export default function Navbar() {
         <a href="">Pricing</a>
       </div>
       <div className="w-[12%] flex justify-between items-center">
-        {token ? (
-          <Button text="Open App" onClick={() => navigate("/dashboard")} />
-        ) : (
-          <>
-            <Link to="/login">
-              <button className="underline text-primary font-semibold cursor-pointer">
-                Login
-              </button>
-            </Link>
-            <Link to="/signup">
-              <Button text="Signup" />
-            </Link>
-          </>
-        )}
+        <Link to="/login">
+          <button className="underline text-primary font-semibold cursor-pointer">
+            Login
+          </button>
+        </Link>
+        <Link to="/signup">
+          <Button text="Signup" />
+        </Link>
       </div>
     </nav>
   );
