@@ -1,11 +1,19 @@
-export default function Button({ className, onClick, text, type, onSubmit, variant = "primary" }) {
-  const baseClasses = "rounded-xl cursor-pointer px-6 py-3 font-medium transition-colors";
+export default function Button({
+  className,
+  onClick,
+  text,
+  type,
+  onSubmit,
+  variant = "primary",
+}) {
+  const baseClasses =
+    "rounded-md cursor-pointer px-6 py-2 font-medium transition-colors";
 
   const variantClasses = {
     primary: "bg-primary hover:bg-primary-hover text-white",
     secondary: "bg-surface-muted hover:bg-border text-text-primary",
     outline: "border border-border hover:bg-surface-muted text-text-primary",
-    danger: "bg-danger hover:bg-red-700 text-white"
+    danger: "bg-danger hover:bg-red-700 text-white",
   };
 
   return (
