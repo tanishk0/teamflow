@@ -1,5 +1,6 @@
 import Workspace from "../db/Workspace.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
+import Invitation from "../db/Invitation.js";
 
 export async function createWorkspace(req , res){
     const { name } = req.body;
@@ -76,33 +77,37 @@ export async function renameWorkspace(req , res){
     }
 }
 
-export async function deleteWorkspace(req,res){
-    try{
-        const { id } = req.params;
-        const workspace = await Workspace.findByIdAndDelete(req.params.id)
-        
-        if(!workspace){
-            return res.status(404).json({
-                message: "Workspace not found"
-            })
-        }
-        await WorkspaceMember.deleteMany({
-            workspaceId: req.params.id
-        });
+export async function deleteWorkspace(req, res) {
+  try {
+    const { id } = req.params;
 
-        await Invitation.deleteMany({
-            workspaceId: id,
-        });
-        res.status(200).json({
-            message: "Workspace deleted successfully"
-            
-        }
-    )
+    const workspace = await Workspace.findByIdAndDelete(id);
+
+
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
     }
-    catch(error){
-        res.status(500).json({
-            message: "Failed to delete workspace",
-            error: error.message
-        })
-    }
+
+    await WorkspaceMember.deleteMany({
+      workspaceId: id,
+    });
+
+    await Invitation.deleteMany({
+      workspaceId: id,
+    });
+
+
+    return res.status(200).json({
+      message: "Workspace deleted successfully",
+    });
+  } catch (error) {
+
+
+    return res.status(500).json({
+      message: "Failed to delete workspace",
+      error: error.message,
+    });
+  }
 }
