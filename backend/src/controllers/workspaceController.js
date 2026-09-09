@@ -95,6 +95,7 @@ export async function deleteWorkspace(req,res){
         });
         res.status(200).json({
             message: "Workspace deleted successfully"
+            
         }
     )
     }
