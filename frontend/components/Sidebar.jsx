@@ -1,29 +1,52 @@
 import { NavLink } from "react-router-dom";
+import { LogOut } from "lucide-react";
+import api from "../src/api/axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ items }) {
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    console.log('clicked')
+    try {
+      
+      await api.post("/auth/logout");
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return (
-    <aside className="flex flex-col w-64 shrink-0 px-4 py-4 bg-white">
-      <div className="text-primary text-2xl">
-        <span className="font-sans font-semibold text-text-primary">Team</span>
-        <span className="font-serif italic">Flow</span>
+    <aside className="flex flex-col justify-between w-64 shrink-0 px-4 py-4 bg-white">
+      <div className="">
+        <div className="text-primary text-2xl">
+          <span className="font-sans font-semibold text-text-primary">
+            Team
+          </span>
+          <span className="font-serif italic">Flow</span>
+        </div>
+        <div className="flex flex-col mt-4">
+          {items.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={({ isActive }) =>
+                `rounded-lg px-4 py-3 text-sm transition ${
+                  isActive
+                    ? "bg-primary font-semibold text-white"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
       </div>
-      <div className="flex flex-col mt-4">
-        {items.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `rounded-lg px-4 py-3 text-sm transition ${
-                isActive
-                  ? "bg-primary font-semibold text-white"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`
-            }
-          >
-            {item.label}
-          </NavLink>
-        ))}
-      </div>
+      <button className="flex items-center gap-1 text-danger cursor-pointer hover:bg-danger-light p-2 rounded-md" onClick={handleLogout}>
+        <LogOut size={18}/>
+        <p className="font-medium">Logout</p>
+      </button>
     </aside>
   );
 }
