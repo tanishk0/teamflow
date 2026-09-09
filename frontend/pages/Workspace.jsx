@@ -54,7 +54,6 @@ export default function Workspace() {
   async function handleDeleteWorkspace(id) {
     try {
       await deleteWorkspace(id);
-
       setWorkspaces((prev) => prev.filter((workspace) => workspace._id !== id));
     } catch (error) {
       console.error(error);
