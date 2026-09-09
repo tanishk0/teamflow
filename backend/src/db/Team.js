@@ -21,11 +21,6 @@ const TeamSchema = new mongoose.Schema(
           ref: "User",
           required: true,
         },
-        role: {
-          type: String,
-          enum: ["manager", "member"],
-          default: "member",
-        },
       },
     ],
   },
