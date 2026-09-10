@@ -29,6 +29,24 @@ export async function createTeam(req, res) {
   }
 }
 
+export async function getTeams(req, res){
+    try{
+        const teams = await Team.find({
+            ownerId: req.userId,
+        });
+
+        return res.status(200).json({
+            message: "Teams fetched successfully",
+            teams,
+        })
+    }
+    catch(error){
+        return res.status(500).json({
+            message: "Failed to fetch teams",
+            error: error.message,
+        });
+    }
+}
 
 
 
