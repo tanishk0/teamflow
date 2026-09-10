@@ -33,6 +33,8 @@ export async function getInvites(req, res) {
         });
     }
 }
+
+//
 export async function getWorkspaceInvites(req, res) {
   const { workspaceId } = req.params;
 
@@ -189,12 +191,6 @@ export async function rejectInvite(req ,res){
         invitation.status = "rejected";
         await invitation.save();
 
-        await WorkspaceMember.deleteOne(
-            {
-                workspaceId: invitation.workspaceId,
-                userId: req.userId,
-            }
-        )
         res.status(200).json({
             message: "Invite rejected successfully"
         })
