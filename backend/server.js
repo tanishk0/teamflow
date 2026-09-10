@@ -7,6 +7,7 @@ import workspaceRoutes from "./src/routes/workspaceRoute.js"
 import invitationRoutes from "./src/routes/invitationRoute.js"
 import cookieParser from "cookie-parser";
 import userRoutes from "./src/routes/userRoute.js"
+import teamRoutes from "./src/routes/teamRoute.js"
 dotenv.config();
 
 const app = express()
@@ -25,6 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/invitations", invitationRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/teams", teamRoutes);
 
 
 // base req
