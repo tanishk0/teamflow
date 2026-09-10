@@ -76,6 +76,24 @@ export async function renameTeam(req, res){
     }
 }
 
+export async function deleteTeam(req, res){
+    const {id} = req.params;
+    try{
+        const team = await Team.findByIdAndDelete(id);
+        if(!team){
+            return res.status(404).json({
+                message: "Team not found",
+            });
+        }
+
+    }
+    catch(error){
+        return res.status(500).json({
+            message: "Failed to delete a team"
+        })
+    }
+}
+
 
 
 
