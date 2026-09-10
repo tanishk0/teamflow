@@ -85,7 +85,6 @@ export async function deleteTeam(req, res){
                 message: "Team not found",
             });
         }
-
     }
     catch(error){
         return res.status(500).json({
@@ -93,6 +92,8 @@ export async function deleteTeam(req, res){
         })
     }
 }
+
+
 
 
 
