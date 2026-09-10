@@ -5,3 +5,4 @@ import { requireAuth } from "../middleware/authMiddleware.js"
 const router = express.Router();
 
 router.post('/', requireAuth, createTeam);
+router.get('/', requireAuth, getTeams);
