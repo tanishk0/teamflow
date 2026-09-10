@@ -48,6 +48,33 @@ export async function getTeams(req, res){
     }
 }
 
+export async function renameTeam(req, res){
+    const {name} = req.body;
+    try{
+        const team = await Team.findByIdAndUpdate(
+            {
+                _id: req.params.id,
+                ownerId: req.userId
+            },
+            {name},
+            {new: true}
+        )
+        if(!team){
+            return res.status(404).json({
+                message: "Team not found"
+            })
+        }
+        res.status(200).json({
+            message:"Team renamed successfully"
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to rename team",
+            error: error.message
+        })
+    }
+}
 
 
 
