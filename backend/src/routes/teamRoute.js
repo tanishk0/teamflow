@@ -6,5 +6,8 @@ const router = express.Router();
 
 router.post('/', requireAuth, createTeam);
 router.get('/', requireAuth, getTeams);
-router.patch('/', requireAuth, renameTeam);
-router.delete('/', requireAuth, deleteTeam);
+router.patch('/:id', requireAuth, renameTeam);
+router.delete('/:id', requireAuth, deleteTeam);
+router.delete('/:id/member', requireAuth, removeMember);
+
+export default router;
