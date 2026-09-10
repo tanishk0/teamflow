@@ -8,6 +8,6 @@ router.post('/', requireAuth, createTeam);
 router.get('/', requireAuth, getTeams);
 router.patch('/:id', requireAuth, renameTeam);
 router.delete('/:id', requireAuth, deleteTeam);
-router.delete('/:id/member', requireAuth, removeMember);
+router.delete('/:id/members', requireAuth, removeMember);
 
 export default router;
