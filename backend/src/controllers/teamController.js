@@ -93,6 +93,37 @@ export async function deleteTeam(req, res){
     }
 }
 
+export async function removeMember(req, res) {
+  const { id } = req.params;
+  const { userId } = req.body;
+
+  try {
+    const team = await Team.findById(id);
+
+    if (!team) {
+      return res.status(404).json({
+        message: "Team not found",
+      });
+    }
+
+    team.members = team.members.filter(
+      (memberId) => memberId.toString() !== userId
+    );
+
+    await team.save();
+
+    return res.status(200).json({
+      message: "Member removed successfully",
+      team,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to remove member",
+      error: error.message,
+    });
+  }
+}
+
 
 
 
