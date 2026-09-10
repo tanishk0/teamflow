@@ -1,4 +1,3 @@
-import User from "../db/User.js";
 import Team from "../db/Team.js";
 
 export async function createTeam(req, res) {
