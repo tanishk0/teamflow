@@ -23,14 +23,10 @@ const TeamInvitationSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["pending", "accepted", "rejected", "expired"],
+      enum: ["pending", "accepted", "rejected"],
       default: "pending",
     },
 
-    expiresAt: {
-      type: Date,
-      required: true,
-    },
   },
   { timestamps: true }
 );
