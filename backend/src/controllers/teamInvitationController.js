@@ -1,6 +1,7 @@
 import TeamInvitation from "../db/TeamInvitation.js"
 import Team from "../db/Team.js"
 import User from "../db/User.js";
+import Invitation from "../db/Invitation.js";
 
 export async function createTeamInvite(req, res){
     const {email} = req.body;
@@ -44,6 +45,51 @@ export async function createTeamInvite(req, res){
         return res.status(500).json({
             message: "Failed to invite a user",
             error: error.message
+        })
+    }
+}
+
+export async function acceptTeamInvite(req, res){
+    //get invite id
+    const { id } = req.params;
+    try{
+
+        const teamInvitation = await TeamInvitation.findById(id);
+        if(!teamInvitation){
+            return res.status(404).json({
+                message: "Invite to the team not found"
+            })
+        }
+        //find user to whom the invite belongs to
+        const user = await User.findById(req.userId);
+        if(teamInvitation.email !== user.email){
+            return res.status(403).json({
+                message: "This invite doesn't belong to you"
+            })
+        }
+
+        //check for pending
+        if(teamInvitation.status !== "pending"){
+            return res.status(400).json({
+                message: "Invite to the team is no longer pending"
+            })
+        }
+        //change status to accepted
+        teamInvitation.status = "accepted"
+        await teamInvitation.save();
+
+        // add member to team
+        await Team.updateOne(
+            { _id: teamInvitation.teamId },
+            { $addToSet: { members: req.userId } }
+        );
+        return res.status(200).json({
+            message: "Team invitation accepted successfully",
+        });
+    }
+    catch(error){
+        return res.status(500).json({
+            message: "Failed to add member"
         })
     }
 }
