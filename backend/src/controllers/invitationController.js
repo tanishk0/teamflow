@@ -97,14 +97,6 @@ export async function createInvite(req, res){
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         })
 
-        //Create workspace member
-        await WorkspaceMember.create({
-            workspaceId,
-            userId: user._id,
-            role,
-            status: "invited"
-        })
-
         res.status(201).json({
             message: "Invitation sent successfully",
             invitation,
