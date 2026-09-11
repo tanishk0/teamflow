@@ -93,3 +93,44 @@ export async function acceptTeamInvite(req, res){
         })
     }
 }
+
+export async function rejectTeamInvite(req, res){
+    //get invite id
+    const { id } = req.params;
+    try{
+
+        const teamInvitation = await TeamInvitation.findById(id);
+        if(!teamInvitation){
+            return res.status(404).json({
+                message: "Invite to the team not found"
+            })
+        }
+        //find user to whom the invite belongs to
+        const user = await User.findById(req.userId);
+        if(teamInvitation.email !== user.email){
+            return res.status(403).json({
+                message: "This invite doesn't belong to you"
+            })
+        }
+
+        //check for pending
+        if(teamInvitation.status !== "pending"){
+            return res.status(400).json({
+                message: "Invite to the team is no longer pending"
+            })
+        }
+        //change status to rejected
+        teamInvitation.status = "rejected"
+        await teamInvitation.save();
+
+        res.status(200).json({
+            message: "Invite rejected successfully"
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to reject invitation",
+            error: error.message,
+        })
+    }   
+}
