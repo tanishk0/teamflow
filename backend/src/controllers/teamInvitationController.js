@@ -134,3 +134,33 @@ export async function rejectTeamInvite(req, res){
         })
     }   
 }
+
+export async function getTeamInvites(req, res){
+    try {
+        const user = await User.findById(req.userId);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+
+        const teamInvitations = await TeamInvitation.find({
+            email: user.email,
+            status: "pending",
+        })
+        .populate("teamId", "name")
+        .populate("inviterId", "name email");
+
+        return res.status(200).json({
+            message: "Invitations fetched successfully",
+            teamInvitations,
+        });
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "Failed to fetch team invites",
+            error: error.message,
+        });
+    }
+}
