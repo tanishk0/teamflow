@@ -1,44 +1,36 @@
 import api from "../api/axios.js";
 
-// Incoming team invitations for logged-in user
-export async function getMyTeamInvites() {
-  const response = await api.get("/team-invitations");
+// Get teams
+export async function getTeams() {
+  const response = await api.get("/teams");
 
-  return response.data.teamInvitations;
+  return response.data.teams;
 }
 
-// Outgoing invitations for a specific team
-export async function getTeamInvites(teamId) {
-  const response = await api.get(
-    `/team-invitations/${teamId}/invitations`
-  );
+// Create team
+export async function createTeam(name) {
+  const response = await api.post("/teams", { name });
 
-  return response.data.teamInvitations;
+  return response.data.team;
 }
 
-// Send team invitation
-export async function createTeamInvite(teamId, email) {
-  const response = await api.post(
-    `/team-invitations/${teamId}`,
-    { email }
-  );
+// Rename team
+export async function renameTeam(id, name) {
+  const response = await api.patch(`/teams/${id}`, { name });
 
-  return response.data;
+  return response.data.team;
 }
 
-// Accept team invitation
-export async function acceptTeamInvite(invitationId) {
-  const response = await api.patch(
-    `/team-invitations/${invitationId}/accept`
-  );
-
-  return response.data;
+// Delete team
+export async function deleteTeam(id) {
+  await api.delete(`/teams/${id}`);
 }
 
-// Reject team invitation
-export async function rejectTeamInvite(invitationId) {
-  const response = await api.patch(
-    `/team-invitations/${invitationId}/reject`
+// Remove member from team
+export async function removeMember(teamId, userId) {
+  const response = await api.delete(
+    `/teams/${teamId}/members`,
+    { data: { userId } }
   );
 
   return response.data;
