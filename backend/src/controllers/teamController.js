@@ -31,7 +31,10 @@ export async function createTeam(req, res) {
 export async function getTeams(req, res){
     try{
         const teams = await Team.find({
-            ownerId: req.userId,
+          $or: [
+            { ownerId: req.userId },
+            { members: req.userId }
+          ]
         });
 
         return res.status(200).json({
