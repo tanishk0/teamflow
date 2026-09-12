@@ -11,7 +11,6 @@ export async function getWorkspaceInvitations(workspaceId) {
   const response = await api.get(
     `/workspaces/${workspaceId}/invitations`,
   );
-
   return response.data.invitations;
 }
 
