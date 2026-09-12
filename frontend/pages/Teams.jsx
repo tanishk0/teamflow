@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar.jsx";
 import { useNavigate } from "react-router-dom";
-import { getMyTeamInvites } from "../src/services/teamInvitationService.js";
 import { getTeams } from "../src/services/teamService.js";
-
+import InvitationCard from "../components/InvitationCard.jsx";
+import {
+  getMyTeamInvites,
+  acceptTeamInvite,
+  rejectTeamInvite,
+} from "../src/services/teamInvitationService.js";
 export default function Teams() {
   const [loading, setLoading] = useState(true);
   const [invites, setInvites] = useState([]);
@@ -38,11 +42,39 @@ export default function Teams() {
     { label: "Invitations", path: "/invitations" },
     { label: "Teams", path: "/teams" },
   ];
+
+  async function handleAcceptInvite(invitationId) {
+    try {
+      await acceptTeamInvite(invitationId);
+
+      // Remove accepted invite from UI
+      setInvites((prev) =>
+        prev.filter((invite) => invite._id !== invitationId),
+      );
+
+      // Refresh teams so the newly joined team appears
+      const updatedTeams = await getTeams();
+      setTeams(updatedTeams);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  async function handleRejectInvite(invitationId) {
+    try {
+      await rejectTeamInvite(invitationId);
+
+      setInvites((prev) =>
+        prev.filter((invite) => invite._id !== invitationId),
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return (
-    <section className="min-h-screen w-full flex">
+    <section className="min-h-screen w-280 flex">
       <Sidebar items={items}></Sidebar>
-      <div className="flex-col p-4">
-        <div className="bg-red-200">
+      <div className="flex-col w-full p-4">
+        <div className="">
           <p className="font-semibold text-xl">Your teams</p>
           {loading ? (
             <p>Loading invitations...</p>
@@ -56,11 +88,16 @@ export default function Teams() {
             ))
           )}
         </div>
-        <div className="bg-green-200">
+        <div className="">
           <p className="font-semibold text-xl">Invites</p>
 
           {invites.map((invite) => (
-            <div key={invite._id}>{invite.teamId.name}</div>
+            <InvitationCard
+              invite={invite}
+              type="team"
+              onAccept={handleAcceptInvite}
+              onReject={handleRejectInvite}
+            />
           ))}
         </div>
       </div>
