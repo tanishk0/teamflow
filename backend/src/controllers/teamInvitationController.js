@@ -135,7 +135,7 @@ export async function rejectTeamInvite(req, res){
     }   
 }
 
-export async function getTeamInvites(req, res){
+export async function getUserInvites(req, res){
     try {
         const user = await User.findById(req.userId);
 
