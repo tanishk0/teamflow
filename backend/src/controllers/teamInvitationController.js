@@ -82,16 +82,19 @@ export async function acceptTeamInvite(req, res){
         await Team.updateOne(
             { _id: teamInvitation.teamId },
             { $addToSet: { members: req.userId } }
+
+
         );
         return res.status(200).json({
             message: "Team invitation accepted successfully",
         });
     }
     catch(error){
-        return res.status(500).json({
-            message: "Failed to add member"
-        })
-    }
+    return res.status(500).json({
+        message: "Failed to add member",
+        error: error.message
+    });
+}
 }
 
 export async function rejectTeamInvite(req, res){
