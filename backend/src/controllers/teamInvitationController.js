@@ -164,3 +164,33 @@ export async function getUserInvites(req, res){
         });
     }
 }
+
+export async function getTeamInvites(req, res) {
+  const { teamId } = req.params;
+
+  try {
+    const team = await Team.findById(teamId);
+
+    if (!team) {
+      return res.status(404).json({
+        message: "Team not found",
+      });
+    }
+
+    const teamInvitations = await TeamInvitation.find({
+      teamId,
+    })
+      .sort({ createdAt: -1 })
+      .populate("inviterId", "name email");
+
+    return res.status(200).json({
+      message: "Team invitations fetched successfully",
+      teamInvitations,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch team invitations",
+      error: error.message,
+    });
+  }
+}
