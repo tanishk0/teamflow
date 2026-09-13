@@ -126,6 +126,35 @@ export async function removeMember(req, res) {
   }
 }
 
+export async function getTeam(req, res) {
+  const { id } = req.params;
+
+  try {
+    const team = await Team.findOne({
+      _id: id,
+      $or: [
+        { ownerId: req.userId },
+        { members: req.userId },
+      ],
+    }).populate("members", "name email");
+
+    if (!team) {
+      return res.status(404).json({
+        message: "Team not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Team fetched successfully",
+      team,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch team",
+      error: error.message,
+    });
+  }
+}
 
 
 
