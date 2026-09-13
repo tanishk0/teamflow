@@ -12,6 +12,7 @@ import Workspace from "../pages/Workspace.jsx";
 import Invitations from "../pages/Invitations.jsx"
 import Teams from "../pages/Teams.jsx";
 import WorkspaceDetail from "../pages/WorkspaceDetail.jsx";
+import Team from "../pages/Team.jsx";
 
 const router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
   {
     path: '/workspace/:id',
     element: <WorkspaceDetail />
+  },
+  {
+    path: '/team/:id', 
+    element: <Team />
   }
 ]);
 
