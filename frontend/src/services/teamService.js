@@ -35,3 +35,8 @@ export async function removeMember(teamId, userId) {
 
   return response.data;
 }
+
+export async function getTeam(id) {
+  const response = await api.get(`/teams/${id}`);
+  return response.data.team;
+}
