@@ -103,7 +103,6 @@ export default function Invitations() {
             ))
           )}
         </div>
-        {/* Team invites */}
       </div>
     </section>
   );
