@@ -76,8 +76,7 @@ export default function TeamModal({ onClose, onCreate }) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-semibold text-text-primary">Create New Workspace</h2>
-            <p className="text-text-secondary text-sm mt-1">Collaborate with your team in a shared workspace</p>
+            <h2 className="text-2xl font-semibold text-text-primary">Create New team</h2>
           </div>
           <button
             onClick={onClose}
@@ -107,7 +106,7 @@ export default function TeamModal({ onClose, onCreate }) {
             <div className="space-y-3 pl-11">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-text-secondary mb-2">
-                  Workspace name *
+                  Team name *
                 </label>
                 <input
                   type="text"
@@ -225,10 +224,7 @@ export default function TeamModal({ onClose, onCreate }) {
                               onClick={() => removeMember(member.email)}
                               className="text-text-muted hover:text-danger transition-colors p-1"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                              </svg>
+                              
                             </button>
                           </div>
                         ))}
@@ -281,7 +277,7 @@ export default function TeamModal({ onClose, onCreate }) {
               className="bg-primary hover:bg-primary-hover text-white rounded-xl px-8 py-3 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!name.trim()}
             >
-              Create Workspace
+              Create Team
             </button>
           </div>
         </form>
