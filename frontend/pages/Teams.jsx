@@ -2,15 +2,12 @@ import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar.jsx";
 import { useNavigate } from "react-router-dom";
 import { getTeams } from "../src/services/teamService.js";
-import InvitationCard from "../components/InvitationCard.jsx";
-import {
-  getMyTeamInvites,
-  acceptTeamInvite,
-  rejectTeamInvite,
-} from "../src/services/teamInvitationService.js";
+import Button from "../components/Button.jsx";
+import TeamCard from "../components/TeamCard.jsx";
+import TeamModal from "../components/modals/AddTeamModal.jsx";
+
 export default function Teams() {
   const [loading, setLoading] = useState(true);
-  const [invites, setInvites] = useState([]);
   const [teams, setTeams] = useState([]);
 
   const navigate = useNavigate();
@@ -39,35 +36,34 @@ export default function Teams() {
   ];
 
   return (
-    <section className="min-h-screen w-280 flex">
+    <section className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
-      <div className="flex-1 p-6 space-y-6 overflow-hidden">
-        {/* Your Teams */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
-          <div className="px-5 py-4 border-b border-gray-200">
-            <p className="font-semibold text-xl">Your teams</p>
-            <p className="text-sm text-gray-500">Teams you belong to</p>
-          </div>
-
-          <div className="p-4 space-y-2">
-            {loading ? (
-              <p className="text-gray-500">Loading teams...</p>
-            ) : teams.length === 0 ? (
-              <p className="text-gray-500">No teams yet.</p>
-            ) : (
-              teams.map((team) => (
-                <div
-                  key={team._id}
-                  onClick={() => navigate(`/team/${team._id}`)}
-                  className="p-4 rounded-lg border border-gray-200
-                       hover:bg-gray-50 hover:border-gray-300
-                       cursor-pointer transition"
-                >
-                  <p className="font-medium">{team.name}</p>
-                </div>
-              ))
-            )}
-          </div>
+      <div className="p-4 flex flex-col w-full">
+        <div className="w-full p-2 flex justify-between">
+          <h2 className="text-3xl font-semibold">Your teams</h2>
+          <Button
+            text="Create team"
+            onClick={() => setShowModal(true)}
+          ></Button>
+        </div>
+        <div className="flex flex-col gap-1 mt-4 h-full">
+          {teams.length === 0 ? (
+            <div className="flex flex-col gap-4 h-full w-full items-center justify-center">
+              <p>You don't have any teams</p>
+              <Button
+                text="Create team"
+                onClick={() => setShowModal(true)}
+              ></Button>
+            </div>
+          ) : (
+            teams.map((team) => (
+              <TeamCard
+                key={team._id}
+                team={team}
+                onClick={() => navigate(`/team/${team._id}`)}
+              />
+            ))
+          )}
         </div>
       </div>
     </section>
