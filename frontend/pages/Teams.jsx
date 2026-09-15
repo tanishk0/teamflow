@@ -42,18 +42,29 @@ export default function Teams() {
   ];
   // Handle create
   async function handleCreateTeam(name, members) {
-    try{
-      const team = await createTeam(name)
-      for(const member of members){
+    try {
+      const team = await createTeam(name);
+      for (const member of members) {
         await createTeamInvite(team._id, member);
       }
-      setTeams((prev)=> [...prev, team]);
+      setTeams((prev) => [...prev, team]);
       setShowModal(false);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //rename
+  async function handleRenameTeam(id, name) {
+    try {
+      await renameTeam(id, name);
+      setTeams((prev)=> 
+        prev.map((team)=> team._id === id? {...team, name}: team),
+      );
     }
     catch(error){
       console.log(error);
     }
-
   }
   return (
     <section className="flex min-h-screen">
@@ -86,6 +97,12 @@ export default function Teams() {
           )}
         </div>
       </div>
+      {showModal && (
+        <TeamModal
+          onClose={() => setShowModal(false)}
+          onCreate={handleCreateTeam}
+        />
+      )}
     </section>
   );
 }
