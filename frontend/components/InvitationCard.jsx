@@ -16,9 +16,9 @@ export default function InvitationCard({ invite, type, onAccept, onReject }) {
       </div>
 
       <div className="flex gap-3">
-        <button className="text-danger cursor-pointer" onClick={() => onReject(invite._id)}>Reject</button>
+        <button className="text-danger cursor-pointer" onClick={() => onReject(invite)}>Reject</button>
 
-        <button className="text-white bg-primary p-2 rounded-md cursor-pointer" onClick={() => onAccept(invite._id)}>Accept</button>
+        <button className="text-white bg-primary p-2 rounded-md cursor-pointer" onClick={() => onAccept(invite)}>Accept</button>
       </div>
     </div>
   );
