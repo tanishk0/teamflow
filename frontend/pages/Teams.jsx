@@ -5,11 +5,17 @@ import { getTeams } from "../src/services/teamService.js";
 import Button from "../components/Button.jsx";
 import TeamCard from "../components/TeamCard.jsx";
 import TeamModal from "../components/modals/AddTeamModal.jsx";
+import {
+  createTeam,
+  renameTeam,
+  deleteTeam,
+} from "../src/services/teamService.js";
+import { createTeamInvite } from "../src/services/teamInvitationService.js";
 
 export default function Teams() {
   const [loading, setLoading] = useState(true);
   const [teams, setTeams] = useState([]);
-
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   //fetching data
@@ -34,7 +40,21 @@ export default function Teams() {
     { label: "Invitations", path: "/invitations" },
     { label: "Teams", path: "/teams" },
   ];
+  // Handle create
+  async function handleCreateTeam(name, members) {
+    try{
+      const team = await createTeam(name)
+      for(const member of members){
+        await createTeamInvite(team._id, member);
+      }
+      setTeams((prev)=> [...prev, team]);
+      setShowModal(false);
+    }
+    catch(error){
+      console.log(error);
+    }
 
+  }
   return (
     <section className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
