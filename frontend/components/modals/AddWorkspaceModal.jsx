@@ -76,14 +76,28 @@ export default function WorkspaceModal({ onClose, onCreate }) {
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-2xl font-semibold text-text-primary">Create New Workspace</h2>
-            <p className="text-text-secondary text-sm mt-1">Collaborate with your team in a shared workspace</p>
+            <h2 className="text-2xl font-semibold text-text-primary">
+              Create New Workspace
+            </h2>
+            <p className="text-text-secondary text-sm mt-1">
+              Collaborate with your team in a shared workspace
+            </p>
           </div>
           <button
             onClick={onClose}
             className="text-text-muted hover:text-text-primary transition-colors p-1"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -95,18 +109,33 @@ export default function WorkspaceModal({ onClose, onCreate }) {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary-light rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                   <line x1="3" y1="9" x2="21" y2="9"></line>
                   <line x1="9" y1="21" y2="9"></line>
                 </svg>
               </div>
-              <h3 className="font-medium text-text-primary">Workspace Details</h3>
+              <h3 className="font-medium text-text-primary">
+                Workspace Details
+              </h3>
             </div>
 
             <div className="space-y-3 pl-11">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-text-secondary mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-medium text-text-secondary mb-2"
+                >
                   Workspace name *
                 </label>
                 <input
@@ -120,8 +149,12 @@ export default function WorkspaceModal({ onClose, onCreate }) {
                   placeholder="e.g., Marketing Team, Product Development"
                   className="w-full border border-border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                 />
-                {nameError && <p className="text-sm text-danger mt-2">{nameError}</p>}
-                <p className="text-xs text-text-muted mt-2">This will be visible to all workspace members</p>
+                {nameError && (
+                  <p className="text-sm text-danger mt-2">{nameError}</p>
+                )}
+                <p className="text-xs text-text-muted mt-2">
+                  This will be visible to all workspace members
+                </p>
               </div>
             </div>
           </div>
@@ -130,7 +163,17 @@ export default function WorkspaceModal({ onClose, onCreate }) {
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary-light rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                   <circle cx="9" cy="7" r="4"></circle>
                   <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -138,7 +181,7 @@ export default function WorkspaceModal({ onClose, onCreate }) {
                 </svg>
               </div>
               <div className="flex items-center gap-3 flex-1">
-                <h3 className="font-medium text-text-primary">Team Members</h3>
+                <h3 className="font-medium text-text-primary">Workspace Members</h3>
                 {members.length > 0 && (
                   <span className="bg-primary-muted text-primary text-xs font-medium px-2 py-1 rounded-full">
                     {members.length} invited
@@ -150,7 +193,7 @@ export default function WorkspaceModal({ onClose, onCreate }) {
                 onClick={() => setShowMembers((prev) => !prev)}
                 className="text-primary hover:text-primary-hover font-medium text-sm transition-colors"
               >
-                {showMembers ? 'Hide' : 'Invite Members'}
+                {showMembers ? "Hide" : "Invite Members"}
               </button>
             </div>
 
@@ -158,7 +201,6 @@ export default function WorkspaceModal({ onClose, onCreate }) {
               <div className="space-y-4 pl-11">
                 <div className="bg-surface-muted p-4 rounded-xl space-y-4">
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-text-secondary">Add team members to collaborate</p>
                     <div className="flex gap-3">
                       <div className="flex-1">
                         <input
@@ -197,7 +239,9 @@ export default function WorkspaceModal({ onClose, onCreate }) {
 
                   {members.length > 0 && (
                     <div className="space-y-3">
-                      <p className="text-sm font-medium text-text-secondary">Invited Members</p>
+                      <p className="text-sm font-medium text-text-secondary">
+                        Invited Members
+                      </p>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {members.map((member) => (
                           <div
@@ -211,12 +255,20 @@ export default function WorkspaceModal({ onClose, onCreate }) {
                                 </span>
                               </div>
                               <div>
-                                <p className="font-medium text-text-primary">{member.email}</p>
+                                <p className="font-medium text-text-primary">
+                                  {member.email}
+                                </p>
                                 <div className="flex items-center gap-2 mt-1">
-                                  <span className={`text-xs px-2 py-1 rounded-full ${member.role === 'manager' ? 'bg-warning-light text-warning' : 'bg-success-light text-success'}`}>
-                                    {member.role === 'manager' ? 'Manager' : 'Member'}
+                                  <span
+                                    className={`text-xs px-2 py-1 rounded-full ${member.role === "manager" ? "bg-warning-light text-warning" : "bg-success-light text-success"}`}
+                                  >
+                                    {member.role === "manager"
+                                      ? "Manager"
+                                      : "Member"}
                                   </span>
-                                  <span className="text-xs text-text-muted">Invited</span>
+                                  <span className="text-xs text-text-muted">
+                                    Invited
+                                  </span>
                                 </div>
                               </div>
                             </div>
@@ -225,7 +277,17 @@ export default function WorkspaceModal({ onClose, onCreate }) {
                               onClick={() => removeMember(member.email)}
                               className="text-text-muted hover:text-danger transition-colors p-1"
                             >
-                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                               </svg>
@@ -242,18 +304,30 @@ export default function WorkspaceModal({ onClose, onCreate }) {
             {/* Quick Actions */}
             {!showMembers && members.length === 0 && (
               <div className="pl-11">
-                <p className="text-sm text-text-muted mb-3">Start collaborating by inviting team members</p>
+                <p className="text-sm text-text-muted mb-3">
+                  Start collaborating by inviting workspace members
+                </p>
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => setShowMembers(true)}
                     className="bg-surface-muted hover:bg-border hover:text-text-primary text-text-secondary rounded-xl px-4 py-3 font-medium transition-colors flex items-center gap-2"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <line x1="12" y1="5" x2="12" y2="19"></line>
                       <line x1="5" y1="12" x2="19" y2="12"></line>
                     </svg>
-                    Invite Team Members
+                    Invite Workspace Members
                   </button>
                   <button
                     type="button"
