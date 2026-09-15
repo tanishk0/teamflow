@@ -49,7 +49,7 @@ export default function Teams() {
             <p className="text-sm text-gray-500">Teams you belong to</p>
           </div>
 
-          <div className="h-64 overflow-y-auto p-4 space-y-2">
+          <div className="p-4 space-y-2">
             {loading ? (
               <p className="text-gray-500">Loading teams...</p>
             ) : teams.length === 0 ? (
