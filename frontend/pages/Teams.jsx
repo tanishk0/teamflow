@@ -44,13 +44,17 @@ export default function Teams() {
   async function handleCreateTeam(name, members) {
     try {
       const team = await createTeam(name);
+      console.log("CREATED TEAM:", team);
+      console.log("MEMBERS TO INVITE:", members);
       for (const member of members) {
+        console.log("INVITING:", member);
         await createTeamInvite(team._id, member);
       }
       setTeams((prev) => [...prev, team]);
       setShowModal(false);
     } catch (error) {
       console.log(error);
+      console.error("CREATE TEAM ERROR:", error);
     }
   }
 
@@ -58,21 +62,19 @@ export default function Teams() {
   async function handleRenameTeam(id, name) {
     try {
       await renameTeam(id, name);
-      setTeams((prev)=> 
-        prev.map((team)=> team._id === id? {...team, name}: team),
+      setTeams((prev) =>
+        prev.map((team) => (team._id === id ? { ...team, name } : team)),
       );
-    }
-    catch(error){
+    } catch (error) {
       console.log(error);
     }
   }
   //delete
-  async function handleDeleteTeam(id){
-    try{
+  async function handleDeleteTeam(id) {
+    try {
       await deleteTeam(id);
-      setTeams((prev) => prev.filter((team) => team._id !== id))
-    }
-    catch(error){
+      setTeams((prev) => prev.filter((team) => team._id !== id));
+    } catch (error) {
       console.log(error);
     }
   }
