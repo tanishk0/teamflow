@@ -66,6 +66,16 @@ export default function Teams() {
       console.log(error);
     }
   }
+  //delete
+  async function handleDeleteTeam(id){
+    try{
+      await deleteTeam(id);
+      setTeams((prev) => prev.filter((team) => team._id !== id))
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
   return (
     <section className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
