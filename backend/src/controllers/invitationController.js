@@ -136,13 +136,12 @@ export async function acceptInvite(req, res){
         invitation.status = "accepted";
         await invitation.save();
         
-        await WorkspaceMember.updateOne(
-            {
-                workspaceId: invitation.workspaceId,
-                userId: req.userId
-            },
-            {status : "active"}
-        )
+        await WorkspaceMember.create({
+            workspaceId: invitation.workspaceId,
+            userId: req.userId,
+            role: invitation.role,
+            status: "active",
+        });
         res.status(200).json({
             message: "Invite accepted"
         })
