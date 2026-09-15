@@ -104,6 +104,8 @@ export default function Teams() {
                 key={team._id}
                 team={team}
                 onClick={() => navigate(`/team/${team._id}`)}
+                onRename={handleRenameTeam}
+                onDelete={handleDeleteTeam}
               />
             ))
           )}
