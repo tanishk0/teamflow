@@ -42,6 +42,7 @@ export async function createTeamInvite(req, res){
         })
     }
     catch(error){
+        console.error("CREATE TEAM INVITE ERROR:", error);
         return res.status(500).json({
             message: "Failed to invite a user",
             error: error.message
