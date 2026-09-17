@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./src/routes/userRoute.js"
 import teamRoutes from "./src/routes/teamRoute.js"
 import teamInvitationRoutes from "./src/routes/teamInvitationRoute.js"
-import workspaceTeamRoutes from "./routes/workspaceTeamRoutes.js";
+import workspaceTeamRoutes from "./src/routes/workspaceTeamRoutes.js";
 dotenv.config();
 
 const app = express()
