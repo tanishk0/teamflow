@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../../src/api/axios.js";
-
+import { getTeams } from "../../src/services/teamService.js";
 export default function WorkspaceModal({ onClose, onCreate }) {
   const [name, setName] = useState("");
   const [showMembers, setShowMembers] = useState(false);
@@ -9,7 +9,8 @@ export default function WorkspaceModal({ onClose, onCreate }) {
   const [members, setMembers] = useState([]);
   const [emailError, setEmailError] = useState("");
   const [nameError, setNameError] = useState("");
-
+  const [teams, setTeams] = useState([]);
+  const [selectedTeams, setSelectedTeams] = useState([]);
   async function addMember() {
     const cleanedEmail = email.trim().toLowerCase();
 
@@ -68,9 +69,21 @@ export default function WorkspaceModal({ onClose, onCreate }) {
       return;
     }
     setNameError("");
-    onCreate(name, members);
+    onCreate(name, members, selectedTeams);
   }
 
+  useEffect(() => {
+    async function fetchTeams() {
+      try {
+        const data = await getTeams();
+        setTeams(data || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchTeams();
+  }, []);
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 backdrop-blur-sm z-50">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8">
@@ -181,7 +194,9 @@ export default function WorkspaceModal({ onClose, onCreate }) {
                 </svg>
               </div>
               <div className="flex items-center gap-3 flex-1">
-                <h3 className="font-medium text-text-primary">Workspace Members</h3>
+                <h3 className="font-medium text-text-primary">
+                  Workspace Members
+                </h3>
                 {members.length > 0 && (
                   <span className="bg-primary-muted text-primary text-xs font-medium px-2 py-1 rounded-full">
                     {members.length} invited
@@ -196,7 +211,61 @@ export default function WorkspaceModal({ onClose, onCreate }) {
                 {showMembers ? "Hide" : "Invite Members"}
               </button>
             </div>
+            <div className="space-y-4 pl-11">
+              <div>
+                <h3 className="font-medium text-text-primary">Add Teams</h3>
 
+                <p className="text-sm text-text-muted mt-1">
+                  Team members will automatically become workspace members.
+                </p>
+              </div>
+
+              {teams.length === 0 ? (
+                <p className="text-sm text-text-muted">
+                  You don't belong to any teams.
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-48 overflow-y-auto">
+                  {teams.map((team) => {
+                    const selected = selectedTeams.includes(team._id);
+
+                    return (
+                      <label
+                        key={team._id}
+                        className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                          selected
+                            ? "border-primary bg-primary-light"
+                            : "border-border hover:bg-surface-muted"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => {
+                            setSelectedTeams((prev) =>
+                              selected
+                                ? prev.filter((id) => id !== team._id)
+                                : [...prev, team._id],
+                            );
+                          }}
+                        />
+
+                        <div>
+                          <p className="font-medium text-text-primary">
+                            {team.name}
+                          </p>
+
+                          <p className="text-xs text-text-muted">
+                            {team.members.length}{" "}
+                            {team.members.length === 1 ? "member" : "members"}
+                          </p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
             {showMembers && (
               <div className="space-y-4 pl-11">
                 <div className="bg-surface-muted p-4 rounded-xl space-y-4">
