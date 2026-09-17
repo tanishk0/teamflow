@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar.jsx";
 import api from "../src/api/axios.js";
-
+import { addTeamsToWorkspace } from "../src/services/workspaceTeamService.js";
 import {
   getWorkspaces,
   createWorkspace,
@@ -36,20 +36,23 @@ export default function Workspace() {
     fetchWorkspaces();
   }, []);
   //Create workspace through add workspace button
-  async function handleCreateWorkspace(name, members) {
+  async function handleCreateWorkspace(name, members, teamIds) {
     try {
       const workspace = await createWorkspace(name);
 
       for (const member of members) {
         await createInvitation(workspace._id, member);
       }
-
+      if (teamIds.length > 0) {
+        await addTeamsToWorkspace(workspace._id, teamIds);
+      }
       setWorkspaces((prev) => [...prev, workspace]);
       setShowModal(false);
     } catch (error) {
       console.error(error);
     }
   }
+
   // handle delete
   async function handleDeleteWorkspace(id) {
     try {
