@@ -46,68 +46,90 @@ export async function getWorkspaceInvites(req, res) {
       invitations,
     });
   } catch (error) {
+        return res.status(500).json({
+            message: "Failed to fetch workspace invitations",
+            error: error.message,
+        });
+    } 
+}
+
+export async function createInvite(req, res) {
+  const { email, role } = req.body;
+
+  console.log("CREATE INVITE BODY:", req.body);
+
+  if (!["manager", "member"].includes(role)) {
+    console.log("INVALID ROLE:", role);
+    return res.status(400).json({
+      message: "Invalid role",
+    });
+  }
+
+  const { workspaceId } = req.params;
+
+  try {
+    console.log("WORKSPACE ID:", workspaceId);
+
+    const workspace = await Workspace.findById(workspaceId);
+
+    console.log("WORKSPACE:", workspace?._id);
+
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    const user = await User.findOne({
+      email: email.toLowerCase().trim(),
+    });
+
+    console.log("INVITED USER:", user?._id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const existingMember = await WorkspaceMember.findOne({
+      workspaceId,
+      userId: user._id,
+    });
+
+    console.log("EXISTING MEMBER:", existingMember);
+
+    if (existingMember) {
+      return res.status(400).json({
+        message: "User is already a member or invited",
+      });
+    }
+
+    console.log("CREATING INVITATION");
+
+    const invitation = await Invitation.create({
+      workspaceId,
+      inviterId: req.userId,
+      email: email.toLowerCase().trim(),
+      role,
+      status: "pending",
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    console.log("INVITATION CREATED:", invitation._id);
+
+    return res.status(201).json({
+      message: "Invitation sent successfully",
+      invitation,
+    });
+  } catch (error) {
+    console.error("CREATE INVITE ERROR:", error);
+
     return res.status(500).json({
-      message: "Failed to fetch workspace invitations",
+      message: "Failed to send an invite",
       error: error.message,
     });
   }
-}
-
-export async function createInvite(req, res){
-    const { email, role } = req.body;
-    if (!["manager", "member"].includes(role)) {
-        return res.status(400).json({
-        message: "Invalid role",
-        });
-    }
-    const { workspaceId } = req.params;
-    try{
-        const workspace = await Workspace.findById(workspaceId);
-        if(!workspace){
-                return res.status(404).json({
-                message: "Workspace not found"
-            });
-        }
-        // 2. Find invited user
-        const user = await User.findOne({email: email.toLowerCase().trim(),});
-
-        if(!user){
-            return res.status(404).json({
-                message: "User not found"
-            })
-        }
-        //check if already a member
-        const existingMember = await WorkspaceMember.findOne({
-            workspaceId,
-            userId: user._id,
-        })
-        if(existingMember){
-            return res.status(400).json({
-                message: "User is already a member or invited"
-            })
-        }
-
-        // Create invite
-        const invitation = await Invitation.create({
-            workspaceId,
-            inviterId: req.userId,
-            email,
-            role,
-            status: "pending",
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        })
-
-        res.status(201).json({
-            message: "Invitation sent successfully",
-            invitation,
-        })
-    }
-    catch(error){
-        res.status(500).json({
-            message: "Failed to sent an invite",
-            error: error.message,
-        });
-    }
 }
 
 export async function acceptInvite(req, res){
