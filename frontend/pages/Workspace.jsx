@@ -38,21 +38,28 @@ export default function Workspace() {
   //Create workspace through add workspace button
   async function handleCreateWorkspace(name, members, teamIds) {
     try {
+      console.log("1", { name, members, teamIds });
+
       const workspace = await createWorkspace(name);
+      console.log("2 workspace created", workspace._id);
+
+      if (teamIds?.length > 0) {
+        console.log("3 adding teams", teamIds);
+        await addTeamsToWorkspace(workspace._id, teamIds);
+        console.log("4 teams added");
+      }
 
       for (const member of members) {
+        console.log("5 inviting", member);
         await createInvitation(workspace._id, member);
       }
-      if (teamIds.length > 0) {
-        await addTeamsToWorkspace(workspace._id, teamIds);
-      }
+
       setWorkspaces((prev) => [...prev, workspace]);
       setShowModal(false);
     } catch (error) {
-      console.error(error);
+      console.error("ERROR:", error.response?.data || error);
     }
   }
-
   // handle delete
   async function handleDeleteWorkspace(id) {
     try {

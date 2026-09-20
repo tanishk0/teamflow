@@ -8,3 +8,4 @@ export async function addTeamsToWorkspace(workspaceId, teamIds) {
 
   return response.data;
 }
+
