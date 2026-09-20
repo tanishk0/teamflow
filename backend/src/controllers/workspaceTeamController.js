@@ -25,13 +25,23 @@ export async function addTeamsToWorkspace(req, res) {
     }
 
     const teams = await Team.find({
+      
       _id: { $in: teamIds },
       $or: [
         { ownerId: req.userId },
         { members: req.userId },
       ],
     });
+    console.log("TEAM IDS FROM FRONTEND:", teamIds);
 
+console.log(
+  "TEAMS FOUND:",
+  teams.map((team) => ({
+    id: team._id,
+    name: team.name,
+    members: team.members,
+  }))
+);
     for (const team of teams) {
       for (const userId of team.members) {
         await WorkspaceMember.updateOne(
@@ -49,8 +59,15 @@ export async function addTeamsToWorkspace(req, res) {
           },
           { upsert: true }
         );
+        console.log("WORKSPACE MEMBER RESULT:", {
+  userId,
+  matched: result.matchedCount,
+  modified: result.modifiedCount,
+  upserted: result.upsertedId,
+});
       }
     }
+    
 
     return res.status(200).json({
       message: "Teams added to workspace successfully",
