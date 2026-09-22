@@ -8,6 +8,7 @@ import {
 } from "../src/services/workspaceService.js";
 import api from "../src/api/axios.js";
 import { createInvitation } from "../src/services/invitationService.js";
+import { addTeamsToWorkspace } from "../src/services/workspaceTeamService.js";
 
 import Button from "../components/Button.jsx";
 import WorkspaceModal from "../components/modals/AddWorkspaceModal.jsx";
@@ -45,12 +46,20 @@ export default function Dashboard() {
   }, []);
 
   //Create workspace through add workspace button
-  async function handleCreateWorkspace(name, members) {
+  async function handleCreateWorkspace(name, members, teamIds) {
     try {
       const workspace = await createWorkspace(name);
 
+      if (teamIds?.length > 0) {
+        await addTeamsToWorkspace(workspace._id, teamIds);
+      }
+
       for (const member of members) {
-        await createInvitation(workspace._id, member);
+        try {
+          await createInvitation(workspace._id, member);
+        } catch (inviteError) {
+          console.warn("Failed to invite member:", member, inviteError);
+        }
       }
 
       setWorkspaces((prev) => [...prev, workspace]);

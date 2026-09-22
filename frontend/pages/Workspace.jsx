@@ -51,7 +51,11 @@ export default function Workspace() {
 
       for (const member of members) {
         console.log("5 inviting", member);
-        await createInvitation(workspace._id, member);
+        try {
+          await createInvitation(workspace._id, member);
+        } catch (inviteError) {
+          console.warn("Failed to invite member:", member, inviteError);
+        }
       }
 
       setWorkspaces((prev) => [...prev, workspace]);
