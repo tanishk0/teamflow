@@ -10,10 +10,9 @@ export default function Team() {
   const [loading, setLoading] = useState(true);
 
   const items = [
-    { label: "Overview", path: "/dashboard" },
-    { label: "Workspaces", path: "/workspaces" },
-    { label: "Invitations", path: "/invitations" },
-    { label: "Teams", path: "/teams" },
+    { label: "Overview", path: "/" },
+    { label: "Members", path: "/invitations" },
+    { label: "Settings", path: "/teams" },
   ];
 
   useEffect(() => {
