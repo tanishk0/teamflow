@@ -16,6 +16,17 @@ router.patch("/:id", requireAuth, isOwner(Workspace, "owner"), renameWorkspace);
 router.delete("/:id", requireAuth, isOwner(Workspace, "owner"), deleteWorkspace);
 
 //Workspace Invitation routes
-router.post("/:workspaceId/invitations", requireAuth, createInvite);
-router.get("/:workspaceId/invitations", requireAuth, getWorkspaceInvites);
+router.post(
+  "/:workspaceId/invitations",
+  requireAuth,
+  isOwner(Workspace, "owner", "workspaceId"),
+  createInvite
+);
+
+router.get(
+  "/:workspaceId/invitations",
+  requireAuth,
+  isOwner(Workspace, "owner", "workspaceId"),
+  getWorkspaceInvites
+);
 export default router;

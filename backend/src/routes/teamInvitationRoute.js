@@ -9,12 +9,22 @@ import {
 } from "../controllers/teamInvitationController.js";
 
 import { requireAuth } from "../middleware/authMiddleware.js";
-
+import { isOwner } from "../middleware/isOwner.js";
+import Team from "../db/Team.js";
 const router = express.Router();
 
-router.post("/:teamId", requireAuth, createTeamInvite);
+router.post("/:teamId",
+  requireAuth,
+  isOwner(Team, "ownerId", "teamId"),
+  createTeamInvite
+);
 
-router.get("/:teamId/invitations", requireAuth, getTeamInvites);
+router.get(
+  "/:teamId/invitations",
+  requireAuth,
+  isOwner(Team, "ownerId", "teamId"),
+  getTeamInvites
+);
 
 router.patch("/:id/accept", requireAuth, acceptTeamInvite);
 
