@@ -9,7 +9,6 @@ export default function Sidebar({ items }) {
   async function handleLogout() {
     console.log('clicked')
     try {
-      
       await api.post("/auth/logout");
       navigate("/");
     } catch (error) {
