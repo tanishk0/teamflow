@@ -1,7 +1,7 @@
-export function isOwner(Model, ownerField = "ownerId"){
+export function isOwner(Model, ownerField = "ownerId", params){
     return async function(req,res,next){
         try{
-            const resource = await Model.findById(req.params.id)
+            const resource = await Model.findById(req.params[params])
 
             if(!resource){
                 return res.status(404).json({
