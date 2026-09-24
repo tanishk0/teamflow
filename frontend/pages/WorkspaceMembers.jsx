@@ -42,11 +42,13 @@ export default function WorkspaceMembers() {
   const [removing, setRemoving] = useState(false);
   const [actionError, setActionError] = useState("");
 
+  const isOwner = Boolean(workspace?.isOwner || workspace?.role === "owner");
+
   const items = [
     { label: "Projects", path: `/workspace/${id}` },
     { label: "Activity Log", path: `/workspace/${id}/activity` },
     { label: "Members", path: `/workspace/${id}/members` },
-    { label: "Settings", path: `/workspace/${id}/settings` },
+    ...(isOwner ? [{ label: "Settings", path: `/workspace/${id}/settings` }] : []),
   ];
 
   async function fetchWorkspaceData() {
@@ -281,8 +283,11 @@ export default function WorkspaceMembers() {
                     user._id &&
                     currentUser._id.toString() === user._id.toString();
 
+                  const isManager = workspace.role === "manager";
                   const canManage =
-                    isOwnerOrManager && !isWorkspaceOwner && !isCurrentUser;
+                    !isWorkspaceOwner &&
+                    !isCurrentUser &&
+                    (isOwner || (isManager && member.role === "member"));
 
                   return (
                     <div
@@ -342,83 +347,87 @@ export default function WorkspaceMembers() {
                                   onClick={() => setOpenMenuId(null)}
                                 />
                                 <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1.5 animate-in fade-in zoom-in-95 duration-100">
-                                  <div className="px-3 py-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
-                                    Role
-                                  </div>
+                                  {isOwner && (
+                                    <>
+                                      <div className="px-3 py-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                                        Role
+                                      </div>
 
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleRoleChange(member, "manager")
-                                    }
-                                    disabled={updatingRoleId === member._id}
-                                    className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between transition cursor-pointer ${
-                                      member.role === "manager"
-                                        ? "text-purple-700 bg-purple-50 font-semibold"
-                                        : "text-gray-700 hover:bg-gray-50"
-                                    }`}
-                                  >
-                                    <span className="flex items-center gap-2">
-                                      <Shield
-                                        size={14}
-                                        className={
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleRoleChange(member, "manager")
+                                        }
+                                        disabled={updatingRoleId === member._id}
+                                        className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                                           member.role === "manager"
-                                            ? "text-purple-600"
-                                            : "text-gray-400"
-                                        }
-                                      />
-                                      Manager
-                                    </span>
-                                    {updatingRoleId === member._id ? (
-                                      <Loader2
-                                        size={13}
-                                        className="animate-spin text-purple-600"
-                                      />
-                                    ) : member.role === "manager" ? (
-                                      <Check
-                                        size={14}
-                                        className="text-purple-600"
-                                      />
-                                    ) : null}
-                                  </button>
+                                            ? "text-purple-700 bg-purple-50 font-semibold"
+                                            : "text-gray-700 hover:bg-gray-50"
+                                        }`}
+                                      >
+                                        <span className="flex items-center gap-2">
+                                          <Shield
+                                            size={14}
+                                            className={
+                                              member.role === "manager"
+                                                ? "text-purple-600"
+                                                : "text-gray-400"
+                                            }
+                                          />
+                                          Manager
+                                        </span>
+                                        {updatingRoleId === member._id ? (
+                                          <Loader2
+                                            size={13}
+                                            className="animate-spin text-purple-600"
+                                          />
+                                        ) : member.role === "manager" ? (
+                                          <Check
+                                            size={14}
+                                            className="text-purple-600"
+                                          />
+                                        ) : null}
+                                      </button>
 
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleRoleChange(member, "member")
-                                    }
-                                    disabled={updatingRoleId === member._id}
-                                    className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between transition cursor-pointer ${
-                                      member.role === "member"
-                                        ? "text-blue-700 bg-blue-50 font-semibold"
-                                        : "text-gray-700 hover:bg-gray-50"
-                                    }`}
-                                  >
-                                    <span className="flex items-center gap-2">
-                                      <User
-                                        size={14}
-                                        className={
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleRoleChange(member, "member")
+                                        }
+                                        disabled={updatingRoleId === member._id}
+                                        className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between transition cursor-pointer ${
                                           member.role === "member"
-                                            ? "text-blue-600"
-                                            : "text-gray-400"
-                                        }
-                                      />
-                                      Member
-                                    </span>
-                                    {updatingRoleId === member._id ? (
-                                      <Loader2
-                                        size={13}
-                                        className="animate-spin text-blue-600"
-                                      />
-                                    ) : member.role === "member" ? (
-                                      <Check
-                                        size={14}
-                                        className="text-blue-600"
-                                      />
-                                    ) : null}
-                                  </button>
+                                            ? "text-blue-700 bg-blue-50 font-semibold"
+                                            : "text-gray-700 hover:bg-gray-50"
+                                        }`}
+                                      >
+                                        <span className="flex items-center gap-2">
+                                          <User
+                                            size={14}
+                                            className={
+                                              member.role === "member"
+                                                ? "text-blue-600"
+                                                : "text-gray-400"
+                                            }
+                                          />
+                                          Member
+                                        </span>
+                                        {updatingRoleId === member._id ? (
+                                          <Loader2
+                                            size={13}
+                                            className="animate-spin text-blue-600"
+                                          />
+                                        ) : member.role === "member" ? (
+                                          <Check
+                                            size={14}
+                                            className="text-blue-600"
+                                          />
+                                        ) : null}
+                                      </button>
 
-                                  <div className="my-1 border-t border-gray-100" />
+                                      <div className="my-1 border-t border-gray-100" />
+                                    </>
+                                  )}
 
                                   <button
                                     type="button"

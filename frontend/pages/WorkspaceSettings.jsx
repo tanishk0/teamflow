@@ -32,11 +32,13 @@ export default function WorkspaceSettings() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  const isOwner = Boolean(workspace?.isOwner || workspace?.role === "owner");
+
   const sidebarItems = [
     { label: "Projects", path: `/workspace/${id}` },
     { label: "Activity Log", path: `/workspace/${id}/activity` },
     { label: "Members", path: `/workspace/${id}/members` },
-    { label: "Settings", path: `/workspace/${id}/settings` },
+    ...(isOwner ? [{ label: "Settings", path: `/workspace/${id}/settings` }] : []),
   ];
 
   useEffect(() => {
@@ -57,6 +59,12 @@ export default function WorkspaceSettings() {
       fetchWorkspaceData();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && workspace && !isOwner) {
+      navigate(`/workspace/${id}`, { replace: true });
+    }
+  }, [loading, workspace, isOwner, id, navigate]);
 
   async function handleSave(e) {
     e.preventDefault();
@@ -142,6 +150,10 @@ export default function WorkspaceSettings() {
         </main>
       </section>
     );
+  }
+
+  if (!isOwner) {
+    return null;
   }
 
   const isNameChanged = name.trim() !== workspace.name && name.trim().length > 0;

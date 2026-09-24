@@ -1,14 +1,27 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
+import { getWorkspace } from "../src/services/workspaceService.js";
 
 export default function WorkspaceDetail() {
   const { id } = useParams();
+  const [workspace, setWorkspace] = useState(null);
+
+  useEffect(() => {
+    if (id) {
+      getWorkspace(id)
+        .then((data) => setWorkspace(data))
+        .catch(() => {});
+    }
+  }, [id]);
+
+  const isOwner = Boolean(workspace?.isOwner || workspace?.role === "owner");
 
   const items = [
     { label: "Projects", path: `/workspace/${id}` },
     { label: "Activity Log", path: `/workspace/${id}/activity` },
     { label: "Members", path: `/workspace/${id}/members` },
-    { label: "Settings", path: `/workspace/${id}/settings` },
+    ...(isOwner ? [{ label: "Settings", path: `/workspace/${id}/settings` }] : []),
   ];
 
   return (
