@@ -33,8 +33,7 @@ export default function TeamSettings() {
   const [deleteError, setDeleteError] = useState("");
 
   const sidebarItems = [
-    { label: "Overview", path: `/team/${id}` },
-    { label: "Members", path: "/invitations" },
+    { label: "Members", path: `/team/${id}` },
     { label: "Settings", path: `/team/${id}/settings` },
   ];
 
