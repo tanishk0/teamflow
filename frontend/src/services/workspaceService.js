@@ -28,3 +28,11 @@ export async function getWorkspaceMembers(id) {
   const response = await api.get(`/workspaces/${id}/members`);
   return response.data.members;
 }
+
+export async function removeWorkspaceMember(workspaceId, userId) {
+  const response = await api.delete(
+    `/workspaces/${workspaceId}/members`,
+    { data: { userId } }
+  );
+  return response.data;
+}
