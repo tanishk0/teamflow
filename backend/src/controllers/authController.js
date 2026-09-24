@@ -45,7 +45,8 @@ export async function signup(req, res) {
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
         res.status(201).json({
-            message: "Account created successfully"
+            message: "Account created successfully",
+            token
         })
     }
     catch(error){
@@ -93,7 +94,8 @@ export async function signin(req, res){
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
         res.status(200).json({
-            message: "Logged in successfully"
+            message: "Logged in successfully",
+            token
         })
     }
     catch(error){

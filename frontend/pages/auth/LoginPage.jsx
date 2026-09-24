@@ -43,7 +43,10 @@ export default function LoginPage() {
         email,
         password,
       });
-      navigate("/dashboard")
+      if (response.data?.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      navigate("/dashboard");
     } catch (error) {
       setError(error.response?.data?.message || "Something went wrong")
     }

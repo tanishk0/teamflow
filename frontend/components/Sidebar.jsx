@@ -10,9 +10,12 @@ export default function Sidebar({ items }) {
     console.log('clicked')
     try {
       await api.post("/auth/logout");
+      localStorage.removeItem("token");
       navigate("/");
     } catch (error) {
       console.error(error);
+      localStorage.removeItem("token");
+      navigate("/");
     }
   }
   return (
