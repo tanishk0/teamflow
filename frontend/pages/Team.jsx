@@ -30,9 +30,14 @@ export default function Team() {
   const [removing, setRemoving] = useState(false);
   const [removeError, setRemoveError] = useState("");
 
+  const isOwner =
+    currentUser?._id &&
+    team?.ownerId &&
+    currentUser._id.toString() === team.ownerId.toString();
+
   const items = [
     { label: "Members", path: `/team/${id}` },
-    { label: "Settings", path: `/team/${id}/settings` },
+    ...(isOwner ? [{ label: "Settings", path: `/team/${id}/settings` }] : []),
   ];
 
   async function fetchTeamData() {
@@ -123,11 +128,6 @@ export default function Team() {
     );
   }
 
-  const isOwner =
-    currentUser?._id &&
-    team?.ownerId &&
-    currentUser._id.toString() === team.ownerId.toString();
-
   return (
     <section className="min-h-screen w-full flex bg-gray-50">
       <Sidebar items={items} />
@@ -150,15 +150,17 @@ export default function Team() {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link
-                to={`/team/${id}/settings`}
-                className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700
-                           text-sm font-medium hover:bg-gray-50
-                           transition flex items-center gap-2 shadow-xs"
-              >
-                <SettingsIcon size={16} className="text-gray-500" />
-                Settings
-              </Link>
+              {isOwner && (
+                <Link
+                  to={`/team/${id}/settings`}
+                  className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700
+                             text-sm font-medium hover:bg-gray-50
+                             transition flex items-center gap-2 shadow-xs"
+                >
+                  <SettingsIcon size={16} className="text-gray-500" />
+                  Settings
+                </Link>
+              )}
 
               {isOwner && (
                 <button

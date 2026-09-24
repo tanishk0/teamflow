@@ -14,12 +14,14 @@ import {
   CheckCircle2,
   Loader2,
 } from "lucide-react";
+import api from "../src/api/axios.js";
 
 export default function TeamSettings() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [team, setTeam] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
@@ -32,9 +34,15 @@ export default function TeamSettings() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
+  const isOwner = Boolean(
+    currentUser?._id &&
+    team?.ownerId &&
+    currentUser._id.toString() === team.ownerId.toString()
+  );
+
   const sidebarItems = [
     { label: "Members", path: `/team/${id}` },
-    { label: "Settings", path: `/team/${id}/settings` },
+    ...(isOwner ? [{ label: "Settings", path: `/team/${id}/settings` }] : []),
   ];
 
   useEffect(() => {
@@ -54,7 +62,18 @@ export default function TeamSettings() {
     if (id) {
       fetchTeamData();
     }
+
+    api
+      .get("/auth/me")
+      .then((res) => setCurrentUser(res.data?.user))
+      .catch(() => {});
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && team && currentUser && !isOwner) {
+      navigate(`/team/${id}`, { replace: true });
+    }
+  }, [loading, team, currentUser, isOwner, id, navigate]);
 
   async function handleSave(e) {
     e.preventDefault();
@@ -140,6 +159,10 @@ export default function TeamSettings() {
         </main>
       </section>
     );
+  }
+
+  if (!isOwner) {
+    return null;
   }
 
   const isNameChanged = name.trim() !== team.name && name.trim().length > 0;
