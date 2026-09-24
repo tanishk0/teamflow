@@ -2,32 +2,56 @@ import Workspace from "../db/Workspace.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import Invitation from "../db/Invitation.js";
 
-export async function createWorkspace(req , res){
-    const { name } = req.body;
-    try {
-        const workspace = await Workspace.create({
-            name: name,
-            owner: req.userId
-        })
-        //creating the owner the first member
-        await WorkspaceMember.create({
-            workspaceId: workspace._id,
-            userId: req.userId,
-            role: "owner",
-            status: "active"
-        })
-        res.status(201).json({
-            message: "Workspace created successfully",
-            workspace
-        })
+export async function createWorkspace(req, res) {
+  const { name } = req.body;
+  const trimmed = name?.trim();
+
+  try {
+    if (!trimmed) {
+      return res.status(400).json({
+        message: "Workspace name is required",
+      });
     }
-    catch(error){
-        console.log(error)
-        res.status(500).json({
-            message: "Failed to create workspace",
-            error: error.message
-        })
+
+    if (trimmed.length > 120) {
+      return res.status(400).json({
+        message: "Workspace name cannot exceed 120 characters",
+      });
     }
+
+    const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const existing = await Workspace.findOne({
+      name: { $regex: new RegExp(`^${escaped}$`, "i") },
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        message: "A workspace with this name already exists",
+      });
+    }
+
+    const workspace = await Workspace.create({
+      name: trimmed,
+      owner: req.userId,
+    });
+    //creating the owner the first member
+    await WorkspaceMember.create({
+      workspaceId: workspace._id,
+      userId: req.userId,
+      role: "owner",
+      status: "active",
+    });
+    res.status(201).json({
+      message: "Workspace created successfully",
+      workspace,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "Failed to create workspace",
+      error: error.message,
+    });
+  }
 }
 
 export async function getWorkspaces(req , res){
@@ -100,30 +124,57 @@ export async function getWorkspace(req, res) {
     }
 }
 
-export async function renameWorkspace(req , res){
-    const {name} = req.body;
-    try{
-        const workspace = await Workspace.findByIdAndUpdate(
-            req.params.id,
-            {name},
-            {new:true}
-        )
+export async function renameWorkspace(req, res) {
+  const { name } = req.body;
+  const trimmed = name?.trim();
 
-        if(!workspace){
-            return res.status(404).json({
-                message: "Workspace not found"
-            })
-        }
-        res.status(200).json({
-            message:"Workspace renamed successfully"
-        })
+  try {
+    if (!trimmed) {
+      return res.status(400).json({
+        message: "Workspace name cannot be empty",
+      });
     }
-    catch(error){
-        res.status(500).json({
-            message: "Failed to rename workspace",
-            error: error.message
-        })
+
+    if (trimmed.length > 120) {
+      return res.status(400).json({
+        message: "Workspace name cannot exceed 120 characters",
+      });
     }
+
+    const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const existing = await Workspace.findOne({
+      _id: { $ne: req.params.id },
+      name: { $regex: new RegExp(`^${escaped}$`, "i") },
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        message: "A workspace with this name already exists",
+      });
+    }
+
+    const workspace = await Workspace.findByIdAndUpdate(
+      req.params.id,
+      { name: trimmed },
+      { new: true }
+    );
+
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    res.status(200).json({
+      message: "Workspace renamed successfully",
+      workspace,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to rename workspace",
+      error: error.message,
+    });
+  }
 }
 
 export async function deleteWorkspace(req, res) {

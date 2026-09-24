@@ -2,16 +2,34 @@ import Team from "../db/Team.js";
 
 export async function createTeam(req, res) {
   const { name } = req.body;
+  const trimmed = name?.trim();
 
   try {
-    if (!name?.trim()) {
+    if (!trimmed) {
       return res.status(400).json({
         message: "Team name is required",
       });
     }
 
+    if (trimmed.length > 120) {
+      return res.status(400).json({
+        message: "Team name cannot exceed 120 characters",
+      });
+    }
+
+    const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const existing = await Team.findOne({
+      name: { $regex: new RegExp(`^${escaped}$`, "i") },
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        message: "A team with this name already exists",
+      });
+    }
+
     const team = await Team.create({
-      name: name.trim(),
+      name: trimmed,
       ownerId: req.userId,
       members: [req.userId],
     });
@@ -51,16 +69,37 @@ export async function getTeams(req, res){
 }
 
 export async function renameTeam(req, res){
-    const {name} = req.body;
+    const { name } = req.body;
+    const trimmed = name?.trim();
+
     try{
-        if (!name || !name.trim()) {
+        if (!trimmed) {
             return res.status(400).json({
                 message: "Team name cannot be empty"
             });
         }
+
+        if (trimmed.length > 120) {
+            return res.status(400).json({
+                message: "Team name cannot exceed 120 characters"
+            });
+        }
+
+        const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        const existing = await Team.findOne({
+            _id: { $ne: req.params.id },
+            name: { $regex: new RegExp(`^${escaped}$`, "i") },
+        });
+
+        if (existing) {
+            return res.status(400).json({
+                message: "A team with this name already exists"
+            });
+        }
+
         const team = await Team.findByIdAndUpdate(
             req.params.id,
-            { name: name.trim() },
+            { name: trimmed },
             { new: true }
         );
         if(!team){
