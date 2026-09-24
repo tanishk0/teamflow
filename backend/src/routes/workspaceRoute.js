@@ -1,5 +1,14 @@
 import express from "express";
-import { createWorkspace, deleteWorkspace, getWorkspaces, getWorkspace, renameWorkspace, getWorkspaceMembers, removeWorkspaceMember } from "../controllers/workspaceController.js";
+import {
+  createWorkspace,
+  deleteWorkspace,
+  getWorkspaces,
+  getWorkspace,
+  renameWorkspace,
+  getWorkspaceMembers,
+  removeWorkspaceMember,
+  updateWorkspaceMemberRole,
+} from "../controllers/workspaceController.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import {
   createInvite,
@@ -14,6 +23,7 @@ router.post("/", requireAuth, createWorkspace);
 router.get("/", requireAuth, getWorkspaces);
 router.get("/:id", requireAuth, getWorkspace);
 router.get("/:id/members", requireAuth, getWorkspaceMembers);
+router.patch("/:id/members/role", requireAuth, updateWorkspaceMemberRole);
 router.delete("/:id/members", requireAuth, removeWorkspaceMember);
 router.patch("/:id", requireAuth, isOwner(Workspace, "owner"), renameWorkspace);
 router.delete("/:id", requireAuth, isOwner(Workspace, "owner"), deleteWorkspace);
