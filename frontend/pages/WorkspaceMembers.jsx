@@ -5,6 +5,7 @@ import {
   getWorkspace,
   getWorkspaceMembers,
   removeWorkspaceMember,
+  updateWorkspaceMemberRole,
 } from "../src/services/workspaceService.js";
 import { getWorkspaceInvitations } from "../src/services/invitationService.js";
 import {
@@ -15,13 +16,18 @@ import {
   AlertTriangle,
   Loader2,
   Users,
+  MoreVertical,
+  Check,
+  User,
 } from "lucide-react";
+import api from "../src/api/axios.js";
 import InviteWorkspaceModal from "../components/modals/InviteWorkspaceModal.jsx";
 
 export default function WorkspaceMembers() {
   const { id } = useParams();
 
   const [workspace, setWorkspace] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [members, setMembers] = useState([]);
   const [pendingInvites, setPendingInvites] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +35,9 @@ export default function WorkspaceMembers() {
   // Invite modal
   const [showInviteModal, setShowInviteModal] = useState(false);
 
-  // Remove member modal
+  // 3-dots menu & Role / Remove member
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const [updatingRoleId, setUpdatingRoleId] = useState(null);
   const [memberToRemove, setMemberToRemove] = useState(null);
   const [removing, setRemoving] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -83,7 +91,40 @@ export default function WorkspaceMembers() {
     if (id) {
       init();
     }
+
+    api
+      .get("/auth/me")
+      .then((res) => setCurrentUser(res.data?.user))
+      .catch(() => {});
   }, [id]);
+
+  async function handleRoleChange(member, newRole) {
+    if (!workspace || !member) return;
+    if (member.role === newRole) {
+      setOpenMenuId(null);
+      return;
+    }
+
+    const targetUserId = member.userId?._id || member.userId;
+    setUpdatingRoleId(member._id);
+    setActionError("");
+
+    try {
+      await updateWorkspaceMemberRole(workspace._id, targetUserId, newRole);
+      setMembers((prev) =>
+        prev.map((m) =>
+          m._id === member._id ? { ...m, role: newRole } : m
+        )
+      );
+      setOpenMenuId(null);
+    } catch (err) {
+      setActionError(
+        err.response?.data?.message || "Failed to update member role"
+      );
+    } finally {
+      setUpdatingRoleId(null);
+    }
+  }
 
   async function confirmRemoveMember() {
     if (!memberToRemove || !workspace) return;
@@ -230,7 +271,18 @@ export default function WorkspaceMembers() {
                     member.role === "owner" ||
                     (workspace.owner?._id &&
                       user._id &&
-                      workspace.owner._id === user._id);
+                      workspace.owner._id.toString() === user._id.toString()) ||
+                    (workspace.owner &&
+                      user._id &&
+                      workspace.owner.toString() === user._id.toString());
+
+                  const isCurrentUser =
+                    currentUser?._id &&
+                    user._id &&
+                    currentUser._id.toString() === user._id.toString();
+
+                  const canManage =
+                    isOwnerOrManager && !isWorkspaceOwner && !isCurrentUser;
 
                   return (
                     <div
@@ -267,16 +319,122 @@ export default function WorkspaceMembers() {
                           </span>
                         )}
 
-                        {/* Remove Member Button */}
-                        {isOwnerOrManager && !isWorkspaceOwner && (
-                          <button
-                            type="button"
-                            onClick={() => setMemberToRemove(member)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
-                            title="Remove member"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                        {/* 3-dots Menu for Role & Remove */}
+                        {canManage && (
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setOpenMenuId(
+                                  openMenuId === member._id ? null : member._id
+                                )
+                              }
+                              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition cursor-pointer"
+                              title="Member options"
+                            >
+                              <MoreVertical size={16} />
+                            </button>
+
+                            {openMenuId === member._id && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={() => setOpenMenuId(null)}
+                                />
+                                <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-gray-200 rounded-xl shadow-lg z-20 py-1.5 animate-in fade-in zoom-in-95 duration-100">
+                                  <div className="px-3 py-1 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                                    Role
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleRoleChange(member, "manager")
+                                    }
+                                    disabled={updatingRoleId === member._id}
+                                    className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between transition cursor-pointer ${
+                                      member.role === "manager"
+                                        ? "text-purple-700 bg-purple-50 font-semibold"
+                                        : "text-gray-700 hover:bg-gray-50"
+                                    }`}
+                                  >
+                                    <span className="flex items-center gap-2">
+                                      <Shield
+                                        size={14}
+                                        className={
+                                          member.role === "manager"
+                                            ? "text-purple-600"
+                                            : "text-gray-400"
+                                        }
+                                      />
+                                      Manager
+                                    </span>
+                                    {updatingRoleId === member._id ? (
+                                      <Loader2
+                                        size={13}
+                                        className="animate-spin text-purple-600"
+                                      />
+                                    ) : member.role === "manager" ? (
+                                      <Check
+                                        size={14}
+                                        className="text-purple-600"
+                                      />
+                                    ) : null}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleRoleChange(member, "member")
+                                    }
+                                    disabled={updatingRoleId === member._id}
+                                    className={`w-full px-3 py-2 text-left text-xs font-medium flex items-center justify-between transition cursor-pointer ${
+                                      member.role === "member"
+                                        ? "text-blue-700 bg-blue-50 font-semibold"
+                                        : "text-gray-700 hover:bg-gray-50"
+                                    }`}
+                                  >
+                                    <span className="flex items-center gap-2">
+                                      <User
+                                        size={14}
+                                        className={
+                                          member.role === "member"
+                                            ? "text-blue-600"
+                                            : "text-gray-400"
+                                        }
+                                      />
+                                      Member
+                                    </span>
+                                    {updatingRoleId === member._id ? (
+                                      <Loader2
+                                        size={13}
+                                        className="animate-spin text-blue-600"
+                                      />
+                                    ) : member.role === "member" ? (
+                                      <Check
+                                        size={14}
+                                        className="text-blue-600"
+                                      />
+                                    ) : null}
+                                  </button>
+
+                                  <div className="my-1 border-t border-gray-100" />
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setMemberToRemove(member);
+                                      setOpenMenuId(null);
+                                    }}
+                                    className="w-full px-3 py-2 text-left text-xs font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition cursor-pointer"
+                                  >
+                                    <Trash2 size={14} />
+                                    Remove member
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
                         )}
                       </div>
                     </div>
