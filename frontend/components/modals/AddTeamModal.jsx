@@ -58,15 +58,31 @@ export default function TeamModal({ onClose, onCreate }) {
     );
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  const [submitting, setSubmitting] = useState(false);
 
-    if (!name.trim()) {
-      setNameError("Workspace name cannot be empty");
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const trimmed = name.trim();
+
+    if (!trimmed) {
+      setNameError("Team name cannot be empty");
       return;
     }
+
+    if (trimmed.length > 120) {
+      setNameError("Team name cannot exceed 120 characters");
+      return;
+    }
+
     setNameError("");
-    onCreate(name, members);
+    setSubmitting(true);
+    try {
+      await onCreate(trimmed, members);
+    } catch (err) {
+      setNameError(err.response?.data?.message || "Failed to create team");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -127,15 +143,29 @@ export default function TeamModal({ onClose, onCreate }) {
 
             <div className="space-y-3 pl-11">
               <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-text-secondary mb-2"
-                >
-                  Team name *
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-text-secondary"
+                  >
+                    Team name *
+                  </label>
+                  <span
+                    className={`text-xs ${
+                      name.length > 120
+                        ? "text-danger font-medium"
+                        : name.length >= 100
+                        ? "text-amber-600 font-medium"
+                        : "text-text-muted"
+                    }`}
+                  >
+                    {name.length}/120 characters
+                  </span>
+                </div>
                 <input
                   type="text"
                   id="name"
+                  maxLength={120}
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);

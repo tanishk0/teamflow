@@ -53,6 +53,7 @@ export default function Teams() {
     } catch (error) {
       console.log(error);
       console.error("CREATE TEAM ERROR:", error);
+      throw error;
     }
   }
 

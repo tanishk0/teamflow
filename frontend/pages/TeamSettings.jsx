@@ -84,6 +84,11 @@ export default function TeamSettings() {
       return;
     }
 
+    if (trimmed.length > 120) {
+      setError("Team name cannot exceed 120 characters");
+      return;
+    }
+
     if (trimmed === team?.name) {
       return;
     }
@@ -211,15 +216,29 @@ export default function TeamSettings() {
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div>
-                <label
-                  htmlFor="team-name"
-                  className="block text-sm font-medium text-text-primary mb-2"
-                >
-                  Team Name
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label
+                    htmlFor="team-name"
+                    className="block text-sm font-medium text-text-primary"
+                  >
+                    Team Name
+                  </label>
+                  <span
+                    className={`text-xs ${
+                      name.length > 120
+                        ? "text-danger font-medium"
+                        : name.length >= 100
+                        ? "text-amber-600 font-medium"
+                        : "text-text-muted"
+                    }`}
+                  >
+                    {name.length}/120 characters
+                  </span>
+                </div>
                 <input
                   id="team-name"
                   type="text"
+                  maxLength={120}
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
