@@ -36,3 +36,11 @@ export async function removeWorkspaceMember(workspaceId, userId) {
   );
   return response.data;
 }
+
+export async function updateWorkspaceMemberRole(workspaceId, userId, role) {
+  const response = await api.patch(
+    `/workspaces/${workspaceId}/members/role`,
+    { userId, role }
+  );
+  return response.data;
+}
