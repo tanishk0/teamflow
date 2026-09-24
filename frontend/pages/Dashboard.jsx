@@ -64,6 +64,7 @@ export default function Dashboard() {
       setShowModal(false);
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
