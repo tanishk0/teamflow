@@ -101,7 +101,20 @@ export async function createInvite(req, res) {
 
     if (existingMember) {
       return res.status(400).json({
-        message: "User is already a member or invited",
+        message: "User is already a member of this workspace",
+      });
+    }
+
+    // Check for existing pending invitation
+    const existingInvite = await Invitation.findOne({
+      workspaceId,
+      email: email.toLowerCase().trim(),
+      status: "pending",
+    });
+
+    if (existingInvite) {
+      return res.status(400).json({
+        message: "An invitation is already pending for this user",
       });
     }
 
@@ -144,7 +157,7 @@ export async function acceptInvite(req, res){
 
         //find the invite belongs to the user
         const user = await User.findById(req.userId);
-        if(invitation.email !== user.email){
+        if(invitation.email?.toLowerCase().trim() !== user.email?.toLowerCase().trim()){
             return res.status(403).json({
                 message: "This invitation does not belong to you"
             })
@@ -188,7 +201,7 @@ export async function rejectInvite(req ,res){
 
         //find the invite belongs to the user
         const user = await User.findById(req.userId);
-        if(invitation.email !== user.email){
+        if(invitation.email?.toLowerCase().trim() !== user.email?.toLowerCase().trim()){
             return res.status(403).json({
                 message: "This invitation does not belong to you"
             })
