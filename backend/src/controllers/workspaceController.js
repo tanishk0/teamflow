@@ -258,3 +258,81 @@ export async function removeWorkspaceMember(req, res) {
     });
   }
 }
+
+export async function updateWorkspaceMemberRole(req, res) {
+  const { id } = req.params;
+  const { userId, role } = req.body;
+
+  try {
+    if (!["manager", "member"].includes(role)) {
+      return res.status(400).json({
+        message: "Role must be either manager or member",
+      });
+    }
+
+    const workspace = await Workspace.findById(id);
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    const ownerIdStr = workspace.owner?._id
+      ? workspace.owner._id.toString()
+      : workspace.owner?.toString();
+
+    const isOwner = ownerIdStr === req.userId.toString();
+    if (!isOwner) {
+      const callerMembership = await WorkspaceMember.findOne({
+        workspaceId: id,
+        userId: req.userId,
+        role: "manager",
+        status: "active",
+      });
+      if (!callerMembership) {
+        return res.status(403).json({
+          message: "Only workspace owners or managers can change member roles",
+        });
+      }
+    }
+
+    // Cannot change the workspace owner's role
+    if (ownerIdStr === userId.toString()) {
+      return res.status(400).json({
+        message: "Cannot change the workspace owner's role",
+      });
+    }
+
+    // User cannot change their own role
+    if (req.userId.toString() === userId.toString()) {
+      return res.status(400).json({
+        message: "You cannot change your own role",
+      });
+    }
+
+    const updatedMember = await WorkspaceMember.findOneAndUpdate(
+      {
+        workspaceId: id,
+        userId,
+      },
+      { role },
+      { new: true }
+    ).populate("userId", "name email");
+
+    if (!updatedMember) {
+      return res.status(404).json({
+        message: "Member not found in this workspace",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Member role updated successfully",
+      member: updatedMember,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to update member role",
+      error: error.message,
+    });
+  }
+}
