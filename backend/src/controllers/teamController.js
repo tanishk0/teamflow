@@ -115,8 +115,14 @@ export async function removeMember(req, res) {
       });
     }
 
+    if (team.ownerId.toString() === userId.toString()) {
+      return res.status(400).json({
+        message: "Cannot remove the team owner",
+      });
+    }
+
     team.members = team.members.filter(
-      (memberId) => memberId.toString() !== userId
+      (memberId) => memberId.toString() !== userId.toString()
     );
 
     await team.save();
