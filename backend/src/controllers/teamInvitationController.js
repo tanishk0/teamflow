@@ -20,25 +20,42 @@ export async function createTeamInvite(req, res){
                 message: "User not found"
             })
         }
-        //Check for existing user
-        const existingMember = team.members.includes(user._id);
+        // Check if user is already owner or member
+        const isOwner = team.ownerId.toString() === user._id.toString();
+        const existingMember = team.members.some(
+            (m) => (m._id ? m._id.toString() : m.toString()) === user._id.toString()
+        );
 
-        if(existingMember){
+        if (isOwner || existingMember) {
             return res.status(400).json({
-                message: "User is already a member"
-            })
+                message: "User is already a member of this team"
+            });
         }
 
-        //Create team invite
+        // Check for existing pending invitation
+        const existingInvite = await TeamInvitation.findOne({
+            teamId,
+            email: email.toLowerCase().trim(),
+            status: "pending"
+        });
+
+        if (existingInvite) {
+            return res.status(400).json({
+                message: "An invitation has already been sent to this user"
+            });
+        }
+
+        // Create team invite
         const teamInvitation = await TeamInvitation.create({
             teamId,
             inviterId: req.userId,
-            email,
+            email: email.toLowerCase().trim(),
             status: "pending"
-        })
+        });
         res.status(201).json({
-            message: "Invitation sent successfully"
-        })
+            message: "Invitation sent successfully",
+            invitation: teamInvitation
+        });
     }
     catch(error){
         console.error("CREATE TEAM INVITE ERROR:", error);
@@ -62,7 +79,7 @@ export async function acceptTeamInvite(req, res){
         }
         //find user to whom the invite belongs to
         const user = await User.findById(req.userId);
-        if(teamInvitation.email !== user.email){
+        if(teamInvitation.email?.toLowerCase().trim() !== user.email?.toLowerCase().trim()){
             return res.status(403).json({
                 message: "This invite doesn't belong to you"
             })
@@ -110,7 +127,7 @@ export async function rejectTeamInvite(req, res){
         }
         //find user to whom the invite belongs to
         const user = await User.findById(req.userId);
-        if(teamInvitation.email !== user.email){
+        if(teamInvitation.email?.toLowerCase().trim() !== user.email?.toLowerCase().trim()){
             return res.status(403).json({
                 message: "This invite doesn't belong to you"
             })

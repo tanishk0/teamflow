@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
 import { getTeam } from "../src/services/teamService.js";
-import { Settings as SettingsIcon } from "lucide-react";
+import { getTeamInvites } from "../src/services/teamInvitationService.js";
+import { Settings as SettingsIcon, UserPlus, Clock } from "lucide-react";
+import InviteTeamMemberModal from "../components/modals/InviteTeamMemberModal.jsx";
 
 export default function Team() {
   const { id } = useParams();
 
   const [team, setTeam] = useState(null);
+  const [pendingInvites, setPendingInvites] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const items = [
     { label: "Overview", path: `/team/${id}` },
@@ -16,19 +20,31 @@ export default function Team() {
     { label: "Settings", path: `/team/${id}/settings` },
   ];
 
-  useEffect(() => {
-    async function fetchTeam() {
-      try {
-        const team = await getTeam(id);
-        setTeam(team);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+  async function fetchTeamData() {
+    try {
+      const teamData = await getTeam(id);
+      setTeam(teamData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchTeam();
+  async function fetchPendingInvites() {
+    try {
+      const invites = await getTeamInvites(id);
+      const pending = (invites || []).filter((inv) => inv.status === "pending");
+      setPendingInvites(pending);
+    } catch (error) {
+      // Non-owner might get 403 or network error, ignore silently
+      setPendingInvites([]);
+    }
+  }
+
+  useEffect(() => {
+    fetchTeamData();
+    fetchPendingInvites();
   }, [id]);
 
   if (loading) {
@@ -97,17 +113,19 @@ export default function Team() {
                 Settings
               </Link>
               <button
+                onClick={() => setShowInviteModal(true)}
                 className="px-4 py-2 rounded-lg bg-blue-600 text-white
                            text-sm font-medium hover:bg-blue-700
-                           transition"
+                           transition cursor-pointer flex items-center gap-2 shadow-xs"
               >
+                <UserPlus size={16} />
                 Invite members
               </button>
             </div>
           </div>
 
           {/* Members */}
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+          <div className="bg-white border border-gray-200 rounded-xl shadow-xs">
             <div className="px-6 py-5 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">Members</h2>
 
@@ -152,8 +170,66 @@ export default function Team() {
               ))}
             </div>
           </div>
+
+          {/* Pending Outgoing Invitations */}
+          {pendingInvites.length > 0 && (
+            <div className="bg-white border border-gray-200 rounded-xl shadow-xs mt-6">
+              <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                    <Clock size={18} className="text-amber-500" />
+                    Pending Invitations
+                  </h2>
+                  <p className="mt-1 text-sm text-gray-500">
+                    Invitations waiting to be accepted by recipients.
+                  </p>
+                </div>
+                <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">
+                  {pendingInvites.length} pending
+                </span>
+              </div>
+
+              <div className="divide-y divide-gray-100">
+                {pendingInvites.map((invite) => (
+                  <div
+                    key={invite._id}
+                    className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-semibold">
+                        {invite.email?.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{invite.email}</p>
+                        <p className="text-xs text-gray-500">
+                          Invited {new Date(invite.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">
+                      Invited
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
+
+      {/* Invite Member Modal */}
+      {showInviteModal && (
+        <InviteTeamMemberModal
+          team={team}
+          onClose={() => setShowInviteModal(false)}
+          onInvited={() => {
+            fetchTeamData();
+            fetchPendingInvites();
+          }}
+        />
+      )}
     </section>
   );
 }
+

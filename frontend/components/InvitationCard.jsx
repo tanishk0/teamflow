@@ -5,12 +5,16 @@ export default function InvitationCard({ invite, type, onAccept, onReject }) {
     <div className="bg-white rounded-md p-5 w-full flex items-center justify-between">
       <div>
         <h3 className="text-xl font-medium">
-          {isTeamInvite ? invite.teamId.name : invite.workspaceId.name}
+          {isTeamInvite
+            ? invite.teamId?.name || "Team"
+            : invite.workspaceId?.name || "Workspace"}
         </h3>
 
-        <p>{invite.inviterId.name} invited you</p>
+        <p>{invite.inviterId?.name || "A team member"} invited you</p>
 
-        <p className="text-sm text-gray-500">{invite.inviterId.email}</p>
+        {invite.inviterId?.email && (
+          <p className="text-sm text-gray-500">{invite.inviterId.email}</p>
+        )}
 
         {!isTeamInvite && <p className="text-sm">Role: {invite.role}</p>}
       </div>
