@@ -152,10 +152,52 @@ export async function deleteWorkspace(req, res) {
       message: "Workspace deleted successfully",
     });
   } catch (error) {
-
-
     return res.status(500).json({
       message: "Failed to delete workspace",
+      error: error.message,
+    });
+  }
+}
+
+export async function getWorkspaceMembers(req, res) {
+  try {
+    const { id } = req.params;
+    const workspace = await Workspace.findById(id);
+    if (!workspace) {
+      return res.status(404).json({
+        message: "Workspace not found",
+      });
+    }
+
+    const membership = await WorkspaceMember.findOne({
+      workspaceId: id,
+      userId: req.userId,
+      status: "active",
+    });
+
+    const isOwner = workspace.owner?._id
+      ? workspace.owner._id.toString() === req.userId.toString()
+      : workspace.owner?.toString() === req.userId.toString();
+
+    if (!membership && !isOwner) {
+      return res.status(403).json({
+        message: "You do not have access to this workspace",
+      });
+    }
+
+    const members = await WorkspaceMember.find({
+      workspaceId: id,
+      status: "active",
+    })
+      .populate("userId", "name email")
+      .sort({ createdAt: 1 });
+
+    return res.status(200).json({
+      members,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch workspace members",
       error: error.message,
     });
   }
