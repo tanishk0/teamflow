@@ -1,158 +1,63 @@
-import { useState } from "react";
-import { DropdownMenu } from "radix-ui";
-import { MoreVertical } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Users, ChevronRight } from "lucide-react";
 
-export default function TeamCard({ team, onClick, onRename, onDelete }) {
-  const [showRenameModal, setShowRenameModal] = useState(false);
-  const [name, setName] = useState(team.name);
-  const [error, setError] = useState("");
+export default function TeamCard({ team, onClick }) {
+  const navigate = useNavigate();
 
-  function handleRename() {
-    const trimmedName = name.trim();
-
-    if (!trimmedName) {
-      setError("Team name cannot be empty");
-      return;
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/team/${team._id}`);
     }
+  };
 
-    if (trimmedName === team.name) {
-      setShowRenameModal(false);
-      return;
-    }
-
-    onRename(team._id, trimmedName);
-    setShowRenameModal(false);
-    setError("");
-  }
-
-  function handleKeyDown(e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleRename();
-    }
-
-    if (e.key === "Escape") {
-      setName(team.name);
-      setError("");
-      setShowRenameModal(false);
-    }
-  }
+  const initial = team.name ? team.name.charAt(0).toUpperCase() : "T";
+  const memberCount = Array.isArray(team.members) ? team.members.length : 0;
 
   return (
-    <>
-      <div
-        className="bg-white border border-gray-200 rounded-xl p-5
-                   cursor-pointer hover:border-gray-300 hover:shadow-sm
-                   transition"
-      >
-        <div className="flex items-center justify-between">
-          <div onClick={onClick} className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900">{team.name}</h3>
+    <div
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      className="group w-full bg-surface border border-border hover:border-primary/30
+                 rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200
+                 cursor-pointer flex items-center justify-between gap-4"
+    >
+      <div className="flex items-center gap-4 min-w-0 flex-1">
+        <div
+          className="w-12 h-12 rounded-xl bg-primary-light text-primary
+                     flex items-center justify-center font-bold text-lg shrink-0
+                     group-hover:bg-primary group-hover:text-white transition-colors duration-200"
+        >
+          {initial}
+        </div>
 
-            <p className="text-sm text-gray-500 mt-1">
-              {team.members.length}{" "}
-              {team.members.length === 1 ? "member" : "members"}
-            </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-text-primary truncate group-hover:text-primary transition-colors">
+              {team.name}
+            </h3>
           </div>
 
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger asChild>
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <MoreVertical size={20} />
-              </button>
-            </DropdownMenu.Trigger>
-
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                sideOffset={8}
-                align="end"
-                className="w-48 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50 p-2"
-              >
-                <DropdownMenu.Item
-                  onSelect={() => {
-                    setName(team.name);
-                    setError("");
-                    setShowRenameModal(true);
-                  }}
-                  className="px-4 py-3 cursor-pointer outline-none hover:bg-gray-100 rounded-lg"
-                >
-                  Rename Team
-                </DropdownMenu.Item>
-
-                <DropdownMenu.Separator className="h-px bg-gray-200 my-1" />
-
-                <DropdownMenu.Item
-                  onSelect={() => onDelete(team._id)}
-                  className="px-4 py-3 cursor-pointer outline-none hover:bg-red-50 text-red-600 rounded-lg"
-                >
-                  Delete Team
-                </DropdownMenu.Item>
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+          <p className="text-xs font-medium text-text-muted mt-0.5 flex items-center gap-1.5">
+            <Users size={13} className="text-text-muted" />
+            <span>
+              {memberCount} {memberCount === 1 ? "member" : "members"}
+            </span>
+          </p>
         </div>
       </div>
 
-      {showRenameModal && (
-        <div className="fixed inset-0 z-[100] bg-black/40 flex items-center justify-center p-4">
-          <div
-            className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-xl font-semibold text-gray-900">Rename Team</h2>
-
-            <p className="text-sm text-gray-500 mt-1">
-              Enter a new name for your team.
-            </p>
-
-            <div className="mt-5">
-              <input
-                autoFocus
-                type="text"
-                value={name}
-                onChange={(e) => {
-                  setName(e.target.value);
-                  setError("");
-                }}
-                onKeyDown={handleKeyDown}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3
-                           focus:outline-none focus:ring-2 focus:ring-primary/20
-                           focus:border-primary"
-                placeholder="Team name"
-              />
-
-              {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
-            </div>
-
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                type="button"
-                onClick={() => {
-                  setName(team.name);
-                  setError("");
-                  setShowRenameModal(false);
-                }}
-                className="px-4 py-2.5 rounded-xl text-gray-600
-                           hover:bg-gray-100 transition"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                onClick={handleRename}
-                className="px-5 py-2.5 rounded-xl bg-primary text-white
-                           hover:bg-primary-hover transition"
-              >
-                Rename
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+      <div className="flex items-center text-text-muted group-hover:text-primary group-hover:translate-x-1 transition-all">
+        <ChevronRight size={20} />
+      </div>
+    </div>
   );
 }

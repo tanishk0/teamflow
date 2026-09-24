@@ -13,6 +13,8 @@ import Invitations from "../pages/Invitations.jsx"
 import Teams from "../pages/Teams.jsx";
 import WorkspaceDetail from "../pages/WorkspaceDetail.jsx";
 import Team from "../pages/Team.jsx";
+import WorkspaceSettings from "../pages/WorkspaceSettings.jsx";
+import TeamSettings from "../pages/TeamSettings.jsx";
 
 const router = createBrowserRouter([
   {
@@ -50,7 +52,15 @@ const router = createBrowserRouter([
   {
     path: '/team/:id', 
     element: <Team />
-  }
+  },
+  {
+    path: "/workspace/:id/settings",
+    element: <WorkspaceSettings />
+  },
+  {
+    path: "/team/:id/settings",
+    element: <TeamSettings />
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(

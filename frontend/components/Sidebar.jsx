@@ -25,10 +25,11 @@ export default function Sidebar({ items }) {
           <span className="font-serif italic">Flow</span>
         </div>
         <div className="flex flex-col mt-4">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <NavLink
-              key={item.path}
+              key={`${item.label}-${item.path}-${index}`}
               to={item.path}
+              end={item.end !== undefined ? item.end : true}
               className={({ isActive }) =>
                 `rounded-lg px-4 py-3 text-sm transition ${
                   isActive

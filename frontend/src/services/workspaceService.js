@@ -5,6 +5,11 @@ export async function getWorkspaces(){
     return response.data.workspaces;
 }
 
+export async function getWorkspace(id) {
+    const response = await api.get(`/workspaces/${id}`);
+    return response.data.workspace;
+}
+
 export async function createWorkspace(name){
     const response = await api.post('/workspaces', {name})
     return response.data.workspace;

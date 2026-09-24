@@ -53,28 +53,31 @@ export async function getTeams(req, res){
 export async function renameTeam(req, res){
     const {name} = req.body;
     try{
+        if (!name || !name.trim()) {
+            return res.status(400).json({
+                message: "Team name cannot be empty"
+            });
+        }
         const team = await Team.findByIdAndUpdate(
-            {
-                _id: req.params.id,
-                ownerId: req.userId
-            },
-            {name},
-            {new: true}
-        )
+            req.params.id,
+            { name: name.trim() },
+            { new: true }
+        );
         if(!team){
             return res.status(404).json({
                 message: "Team not found"
-            })
+            });
         }
         res.status(200).json({
-            message:"Team renamed successfully"
-        })
+            message:"Team renamed successfully",
+            team
+        });
     }
     catch(error){
         res.status(500).json({
             message: "Failed to rename team",
             error: error.message
-        })
+        });
     }
 }
 
@@ -87,11 +90,15 @@ export async function deleteTeam(req, res){
                 message: "Team not found",
             });
         }
+        return res.status(200).json({
+            message: "Team deleted successfully",
+        });
     }
     catch(error){
         return res.status(500).json({
-            message: "Failed to delete a team"
-        })
+            message: "Failed to delete a team",
+            error: error.message
+        });
     }
 }
 

@@ -3,8 +3,6 @@ import Sidebar from "../components/Sidebar.jsx";
 import {
   getWorkspaces,
   createWorkspace,
-  renameWorkspace,
-  deleteWorkspace,
 } from "../src/services/workspaceService.js";
 import api from "../src/api/axios.js";
 import { createInvitation } from "../src/services/invitationService.js";
@@ -68,30 +66,7 @@ export default function Dashboard() {
       console.error(error);
     }
   }
-  // handle delete
-  async function handleDeleteWorkspace(id) {
-    try {
-      await deleteWorkspace(id);
 
-      setWorkspaces((prev) => prev.filter((workspace) => workspace._id !== id));
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  //handle name
-  async function handleRenameWorkspace(id, name) {
-    try {
-      await renameWorkspace(id, name);
-
-      setWorkspaces((prev) =>
-        prev.map((workspace) =>
-          workspace._id === id ? { ...workspace, name } : workspace,
-        ),
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  }
   return (
     <div className="flex min-h-screen">
       <Sidebar items={items} />
@@ -124,8 +99,6 @@ export default function Dashboard() {
                 <WorkspaceCard
                   key={workspace._id}
                   workspace={workspace}
-                  onRename={handleRenameWorkspace}
-                  onDelete={handleDeleteWorkspace}
                 />
               ))
           )}

@@ -53,6 +53,53 @@ export async function getWorkspaces(req , res){
     }
 }
 
+export async function getWorkspace(req, res) {
+    try {
+        const { id } = req.params;
+        const workspace = await Workspace.findById(id).populate("owner", "name email");
+        if (!workspace) {
+            return res.status(404).json({
+                message: "Workspace not found",
+            });
+        }
+
+        const membership = await WorkspaceMember.findOne({
+            workspaceId: id,
+            userId: req.userId,
+            status: "active",
+        });
+
+        const isWorkspaceOwner = workspace.owner?._id
+            ? workspace.owner._id.toString() === req.userId.toString()
+            : workspace.owner?.toString() === req.userId.toString();
+
+        if (!membership && !isWorkspaceOwner) {
+            return res.status(403).json({
+                message: "You do not have access to this workspace",
+            });
+        }
+
+        const membersCount = await WorkspaceMember.countDocuments({
+            workspaceId: id,
+            status: "active",
+        });
+
+        return res.status(200).json({
+            workspace: {
+                ...workspace.toObject(),
+                membersCount,
+                isOwner: isWorkspaceOwner,
+                role: isWorkspaceOwner ? "owner" : (membership?.role || "member"),
+            },
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Failed to fetch workspace",
+            error: error.message,
+        });
+    }
+}
+
 export async function renameWorkspace(req , res){
     const {name} = req.body;
     try{

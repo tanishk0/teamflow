@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
 import { getTeam } from "../src/services/teamService.js";
+import { Settings as SettingsIcon } from "lucide-react";
 
 export default function Team() {
   const { id } = useParams();
@@ -10,9 +11,9 @@ export default function Team() {
   const [loading, setLoading] = useState(true);
 
   const items = [
-    { label: "Overview", path: "/" },
+    { label: "Overview", path: `/team/${id}` },
     { label: "Members", path: "/invitations" },
-    { label: "Settings", path: "/teams" },
+    { label: "Settings", path: `/team/${id}/settings` },
   ];
 
   useEffect(() => {
@@ -85,13 +86,24 @@ export default function Team() {
               </p>
             </div>
 
-            <button
-              className="px-4 py-2 rounded-lg bg-blue-600 text-white
-                         text-sm font-medium hover:bg-blue-700
-                         transition"
-            >
-              Invite members
-            </button>
+            <div className="flex items-center gap-3">
+              <Link
+                to={`/team/${id}/settings`}
+                className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700
+                           text-sm font-medium hover:bg-gray-50
+                           transition flex items-center gap-2 shadow-xs"
+              >
+                <SettingsIcon size={16} className="text-gray-500" />
+                Settings
+              </Link>
+              <button
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white
+                           text-sm font-medium hover:bg-blue-700
+                           transition"
+              >
+                Invite members
+              </button>
+            </div>
           </div>
 
           {/* Members */}

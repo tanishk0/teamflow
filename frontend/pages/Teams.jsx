@@ -7,8 +7,6 @@ import TeamCard from "../components/TeamCard.jsx";
 import TeamModal from "../components/modals/AddTeamModal.jsx";
 import {
   createTeam,
-  renameTeam,
-  deleteTeam,
 } from "../src/services/teamService.js";
 import { createTeamInvite } from "../src/services/teamInvitationService.js";
 
@@ -58,26 +56,6 @@ export default function Teams() {
     }
   }
 
-  //rename
-  async function handleRenameTeam(id, name) {
-    try {
-      await renameTeam(id, name);
-      setTeams((prev) =>
-        prev.map((team) => (team._id === id ? { ...team, name } : team)),
-      );
-    } catch (error) {
-      console.log(error);
-    }
-  }
-  //delete
-  async function handleDeleteTeam(id) {
-    try {
-      await deleteTeam(id);
-      setTeams((prev) => prev.filter((team) => team._id !== id));
-    } catch (error) {
-      console.log(error);
-    }
-  }
   return (
     <section className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
@@ -104,8 +82,6 @@ export default function Teams() {
                 key={team._id}
                 team={team}
                 onClick={() => navigate(`/team/${team._id}`)}
-                onRename={handleRenameTeam}
-                onDelete={handleDeleteTeam}
               />
             ))
           )}

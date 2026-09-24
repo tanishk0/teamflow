@@ -1,7 +1,6 @@
 import TeamInvitation from "../db/TeamInvitation.js"
 import Team from "../db/Team.js"
 import User from "../db/User.js";
-import Invitation from "../db/Invitation.js";
 
 export async function createTeamInvite(req, res){
     const {email} = req.body;

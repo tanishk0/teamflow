@@ -5,8 +5,6 @@ import { addTeamsToWorkspace } from "../src/services/workspaceTeamService.js";
 import {
   getWorkspaces,
   createWorkspace,
-  renameWorkspace,
-  deleteWorkspace,
 } from "../src/services/workspaceService.js";
 import { createInvitation } from "../src/services/invitationService.js";
 import Button from "../components/Button.jsx";
@@ -64,29 +62,7 @@ export default function Workspace() {
       console.error("ERROR:", error.response?.data || error);
     }
   }
-  // handle delete
-  async function handleDeleteWorkspace(id) {
-    try {
-      await deleteWorkspace(id);
-      setWorkspaces((prev) => prev.filter((workspace) => workspace._id !== id));
-    } catch (error) {
-      console.error(error);
-    }
-  }
-  //handle name
-  async function handleRenameWorkspace(id, name) {
-    try {
-      await renameWorkspace(id, name);
 
-      setWorkspaces((prev) =>
-        prev.map((workspace) =>
-          workspace._id === id ? { ...workspace, name } : workspace,
-        ),
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  }
   return (
     <div className="flex min-h-screen">
       <Sidebar items={items}></Sidebar>
@@ -112,8 +88,6 @@ export default function Workspace() {
               <WorkspaceCard
                 key={workspace._id}
                 workspace={workspace}
-                onRename={handleRenameWorkspace}
-                onDelete={handleDeleteWorkspace}
               />
             ))
           )}
