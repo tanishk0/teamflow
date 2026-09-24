@@ -75,6 +75,11 @@ export default function WorkspaceSettings() {
       return;
     }
 
+    if (trimmed.length > 120) {
+      setError("Workspace name cannot exceed 120 characters");
+      return;
+    }
+
     if (trimmed === workspace?.name) {
       return;
     }
@@ -202,15 +207,29 @@ export default function WorkspaceSettings() {
 
             <form onSubmit={handleSave} className="p-6 space-y-4">
               <div>
-                <label
-                  htmlFor="workspace-name"
-                  className="block text-sm font-medium text-text-primary mb-2"
-                >
-                  Workspace Name
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label
+                    htmlFor="workspace-name"
+                    className="block text-sm font-medium text-text-primary"
+                  >
+                    Workspace Name
+                  </label>
+                  <span
+                    className={`text-xs ${
+                      name.length > 120
+                        ? "text-danger font-medium"
+                        : name.length >= 100
+                        ? "text-amber-600 font-medium"
+                        : "text-text-muted"
+                    }`}
+                  >
+                    {name.length}/120 characters
+                  </span>
+                </div>
                 <input
                   id="workspace-name"
                   type="text"
+                  maxLength={120}
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);

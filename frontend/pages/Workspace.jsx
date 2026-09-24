@@ -60,6 +60,7 @@ export default function Workspace() {
       setShowModal(false);
     } catch (error) {
       console.error("ERROR:", error.response?.data || error);
+      throw error;
     }
   }
 

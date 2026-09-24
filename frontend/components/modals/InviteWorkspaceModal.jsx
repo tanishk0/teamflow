@@ -249,6 +249,11 @@ export default function InviteWorkspaceModal({
       return;
     }
 
+    if (trimmed.length > 120) {
+      setError("Team name cannot exceed 120 characters");
+      return;
+    }
+
     setCreatingTeam(true);
     setError("");
 
@@ -565,25 +570,41 @@ export default function InviteWorkspaceModal({
                   <p className="text-xs font-medium text-blue-900">
                     Create a new team and automatically add it:
                   </p>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="e.g. Design Team, DevOps"
-                      value={newTeamName}
-                      onChange={(e) => setNewTeamName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleCreateNewTeam();
-                        }
-                      }}
-                      className="flex-1 px-3 py-2 bg-white border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    />
+                  <div className="flex gap-2 items-start">
+                    <div className="flex-1 space-y-1">
+                      <input
+                        type="text"
+                        maxLength={120}
+                        placeholder="e.g. Design Team, DevOps"
+                        value={newTeamName}
+                        onChange={(e) => setNewTeamName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleCreateNewTeam();
+                          }
+                        }}
+                        className="w-full px-3 py-2 bg-white border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      />
+                      <div className="text-right">
+                        <span
+                          className={`text-[11px] ${
+                            newTeamName.length > 120
+                              ? "text-danger font-medium"
+                              : newTeamName.length >= 100
+                              ? "text-amber-600 font-medium"
+                              : "text-text-muted"
+                          }`}
+                        >
+                          {newTeamName.length}/120 characters
+                        </span>
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={handleCreateNewTeam}
                       disabled={creatingTeam || !newTeamName.trim()}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition cursor-pointer disabled:opacity-50"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition cursor-pointer disabled:opacity-50 shrink-0"
                     >
                       {creatingTeam ? "Creating..." : "Create"}
                     </button>
