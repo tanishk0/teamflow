@@ -23,3 +23,8 @@ export async function renameWorkspace(id, name) {
 export async function deleteWorkspace(id) {
   await api.delete(`/workspaces/${id}`);
 }
+
+export async function getWorkspaceMembers(id) {
+  const response = await api.get(`/workspaces/${id}/members`);
+  return response.data.members;
+}
