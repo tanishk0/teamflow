@@ -10,7 +10,7 @@ export async function createProject(req, res){
                 message: "Project name is required"
             })
         }
-        if(description.trim().length > 500){
+        if(description?.trim().length > 500){
             return res.status(400).json({
                 message: "Description cannot be longer than 500 characters"
             })
@@ -41,7 +41,8 @@ export async function createProject(req, res){
             }
         )
         return res.status(201).json({
-            message: "Project created successfully"
+            message: "Project created successfully",
+            project,
         })
     }
     catch(error){
@@ -56,7 +57,7 @@ export async function createProject(req, res){
 export async function getProjects(req, res){
     try{
         const {workspaceId} = req.params
-        const projects = Project.find({
+        const projects = await Project.find({
             workspaceId,
         })
         return res.status(200).json({
