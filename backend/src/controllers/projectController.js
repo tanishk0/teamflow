@@ -107,5 +107,56 @@ export async function getProject(req, res){
     }
 }
 
+export async function renameProject(req, res){
+    const {name} = req.body;
+    const trimmed = name?.trim()
+    
+    try{
+        if(!trimmed){
+            return res.status(400).json({
+                message: "Rename should have a valid name."
+            })
+        }
+        if(trimmed.length > 120){
+            return res.status(400).json({
+                message: "Rename should have a valid name less than 120 chars."
+            })
+        }
+        const project = await Project.findById(req.params.id);
+
+        const member = await WorkspaceMember.findOne({
+            workspaceId: project.workspaceId,
+            userId: req.userId,
+            status: "active",
+        });
+
+        if (!member || !["owner", "manager"].includes(member.role)) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+        const updatedProject = await Project.findByIdAndUpdate(
+            req.params.id,
+            {name: trimmed},
+            { new: true }
+        )
+
+        if(!project){
+            return res.status(404).json({
+                message: "Project not found"
+            })
+        }
+
+        res.status(200).json({
+            message: "Project renamed successfully",
+            project,
+        });
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to rename project.",
+            error: error.message
+        })
+    }
+}
+
 
 
