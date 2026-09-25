@@ -158,5 +158,34 @@ export async function renameProject(req, res){
     }
 }
 
+export async function deleteProject(req,res){
+    try{
+        const project = await Project.findById(req.params)
+        if(!project){
+            return res.status(404).json({
+                message: "Project not found."
+            })
+        }
+        const member = await WorkspaceMember.findOne({
+            workspaceId: project.workspaceId,
+            userId: req.userId,
+            status: "active",
+        });
+
+        if (!member || !["owner", "manager"].includes(member.role)) {
+            return res.status(403).json({ message: "Not authorized" });
+        }
+
+        await Project.findByIdAndDelete(req.params.id);
+        return res.status(200).json({
+            message: "Project deleted successfully",
+        });
+    }
+    catch(error){
+        return res.status(500).json({
+            message: "Failed to delete project",
+        });
+    }
+}
 
 
