@@ -1,17 +1,37 @@
-import express from "express"
+import api from "./api.js";
 
-import {
-    createProject, getProjects, getProject, renameProject, deleteProject
-} from "../controllers/projectController.js"
-import { requireAuth } from "../middleware/authMiddleware.js"
+export async function createProject(workspaceId, name, description = "") {
+  const response = await api.post(
+    `/workspaces/${workspaceId}/projects`,
+    { name, description }
+  );
+  return response.data.project;
+}
 
-const router = express.Router();
+export async function getProjects(workspaceId) {
+  const response = await api.get(
+    `/workspaces/${workspaceId}/projects`
+  );
+  return response.data.projects;
+}
 
-router.post("/:workspaceId/projects", requireAuth, createProject);
-router.get("/:workspaceId/projects", requireAuth, getProjects);
-router.get("/:workspaceId/projects/:projectId", requireAuth, getProject);
-router.patch("/:workspaceId/projects/:projectId", requireAuth, renameProject);
-router.delete("/:workspaceId/projects/:projectId", requireAuth, deleteProject);
+export async function getProject(workspaceId, projectId) {
+  const response = await api.get(
+    `/workspaces/${workspaceId}/projects/${projectId}`
+  );
+  return response.data.project;
+}
 
-export default router;
+export async function renameProject(workspaceId, projectId, name) {
+  const response = await api.patch(
+    `/workspaces/${workspaceId}/projects/${projectId}`,
+    { name }
+  );
+  return response.data.project;
+}
 
+export async function deleteProject(workspaceId, projectId) {
+  await api.delete(
+    `/workspaces/${workspaceId}/projects/${projectId}`
+  );
+}
