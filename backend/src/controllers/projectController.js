@@ -1,6 +1,6 @@
 import Project from "../db/Project.js"
 import WorkspaceMember from "../db/WorkspaceMember.js";
-
+import Task from "../db/Task.js";
 export async function createProject(req, res){
     const {name, description} = req.body;
     const {workspaceId} = req.params;
@@ -48,3 +48,25 @@ export async function createProject(req, res){
         })
     }
 }
+
+
+export async function getProjects(req, res){
+    try{
+        const {workspaceId} = req.params
+        const projects = Project.find({
+            workspaceId,
+        })
+        return res.status(200).json({
+            projects
+        })
+    }
+    catch(error){
+        res.status(500).json({
+            message: "Failed to fetch projects.",
+            error: error.message
+        });
+    }
+}
+
+
+
