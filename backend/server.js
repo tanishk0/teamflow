@@ -11,7 +11,7 @@ import teamRoutes from "./src/routes/teamRoute.js"
 import teamInvitationRoutes from "./src/routes/teamInvitationRoute.js"
 import workspaceTeamRoutes from "./src/routes/workspaceTeamRoutes.js";
 dotenv.config();
-
+import projectRoutes from "./src/routes/projectRoute.js"
 const app = express()
 
 app.use(cors({
@@ -31,7 +31,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/teams", teamRoutes);
 app.use("/api/team-invitations", teamInvitationRoutes);
 app.use("/api/workspaces", workspaceTeamRoutes);
-
+app.use("/api/workspaces", projectRoutes);
 
 // base req
 app.get("/" , (req , res)=> {
