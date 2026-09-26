@@ -13,6 +13,7 @@ const router = express.Router();
 
 router.post("/:workspaceId/projects", requireAuth, createProject);
 router.get("/:workspaceId/projects", requireAuth, getProjects);
+router.get("/project/:projectId", requireAuth, getProject);
 router.get("/:workspaceId/projects/:projectId", requireAuth, getProject);
 router.patch("/:workspaceId/projects/:projectId", requireAuth, renameProject);
 router.delete("/:workspaceId/projects/:projectId", requireAuth, deleteProject);
