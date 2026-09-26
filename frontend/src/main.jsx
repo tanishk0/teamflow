@@ -17,6 +17,7 @@ import WorkspaceSettings from "../pages/WorkspaceSettings.jsx";
 import TeamSettings from "../pages/TeamSettings.jsx";
 import WorkspaceMembers from "../pages/WorkspaceMembers.jsx";
 import WorkspaceActivity from "../pages/WorkspaceActivity.jsx";
+import ProjectDetail from "../pages/ProjectDetail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,14 @@ const router = createBrowserRouter([
   {
     path: "/team/:id/settings",
     element: <TeamSettings />
+  },
+  {
+    path: "/project/:projectId",
+    element: <ProjectDetail />,
+  },
+  {
+    path: "/:projectId",
+    element: <ProjectDetail />,
   },
 ]);
 
