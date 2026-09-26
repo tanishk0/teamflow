@@ -59,7 +59,7 @@ export async function getProjects(req, res){
         const {workspaceId} = req.params
         const projects = await Project.find({
             workspaceId,
-        })
+        }).sort({ updatedAt: -1, createdAt: -1 });
         return res.status(200).json({
             projects,
             message: "Projects fetched successfully"
@@ -74,7 +74,7 @@ export async function getProjects(req, res){
 }
 
 export async function getProject(req, res){
-    const { id } = req.params;
+    const id = req.params.projectId || req.params.id;
     try{
         const project = await Project.findById(id);
         if(!project){
@@ -96,7 +96,8 @@ export async function getProject(req, res){
         }
 
         return res.status(200).json({
-            message: "Project fetched successfully"
+            message: "Project fetched successfully",
+            project,
         })
 
     }
@@ -110,7 +111,8 @@ export async function getProject(req, res){
 
 export async function renameProject(req, res){
     const {name} = req.body;
-    const trimmed = name?.trim()
+    const trimmed = name?.trim();
+    const id = req.params.projectId || req.params.id;
     
     try{
         if(!trimmed){
@@ -123,7 +125,13 @@ export async function renameProject(req, res){
                 message: "Rename should have a valid name less than 120 chars."
             })
         }
-        const project = await Project.findById(req.params.id);
+        const project = await Project.findById(id);
+
+        if(!project){
+            return res.status(404).json({
+                message: "Project not found"
+            })
+        }
 
         const member = await WorkspaceMember.findOne({
             workspaceId: project.workspaceId,
@@ -135,20 +143,14 @@ export async function renameProject(req, res){
             return res.status(403).json({ message: "Not authorized" });
         }
         const updatedProject = await Project.findByIdAndUpdate(
-            req.params.id,
+            id,
             {name: trimmed},
             { new: true }
-        )
-
-        if(!project){
-            return res.status(404).json({
-                message: "Project not found"
-            })
-        }
+        );
 
         res.status(200).json({
             message: "Project renamed successfully",
-            project,
+            project: updatedProject,
         });
     }
     catch(error){
@@ -160,8 +162,9 @@ export async function renameProject(req, res){
 }
 
 export async function deleteProject(req,res){
+    const id = req.params.projectId || req.params.id;
     try{
-        const project = await Project.findById(req.params)
+        const project = await Project.findById(id);
         if(!project){
             return res.status(404).json({
                 message: "Project not found."
@@ -177,7 +180,7 @@ export async function deleteProject(req,res){
             return res.status(403).json({ message: "Not authorized" });
         }
 
-        await Project.findByIdAndDelete(req.params.id);
+        await Project.findByIdAndDelete(id);
         return res.status(200).json({
             message: "Project deleted successfully",
         });
@@ -185,6 +188,7 @@ export async function deleteProject(req,res){
     catch(error){
         return res.status(500).json({
             message: "Failed to delete project",
+            error: error.message,
         });
     }
 }
