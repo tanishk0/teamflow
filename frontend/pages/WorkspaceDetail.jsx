@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
 import Button from "../components/Button.jsx";
 import { getWorkspace } from "../src/services/workspaceService.js";
@@ -9,6 +9,7 @@ import { Folder, FolderPlus, Clock } from "lucide-react";
 
 export default function WorkspaceDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [workspace, setWorkspace] = useState(null);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,7 +53,7 @@ export default function WorkspaceDetail() {
 
   return (
     <section className="flex min-h-screen w-full bg-gray-50">
-      <Sidebar items={items} />
+      <Sidebar items={items} workspaceId={id} />
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -101,14 +102,29 @@ export default function WorkspaceDetail() {
               {projects.map((project) => (
                 <div
                   key={project._id}
-                  className="bg-white rounded-2xl p-6 border border-border hover:border-primary/40 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between"
+                  onClick={() =>
+                    navigate(`/${project._id}`, {
+                      state: { workspaceId: id, workspace, project },
+                    })
+                  }
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      navigate(`/${project._id}`, {
+                        state: { workspaceId: id, workspace, project },
+                      });
+                    }
+                  }}
+                  className="group bg-white rounded-2xl p-6 border border-border hover:border-primary/40 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary-light text-primary flex items-center justify-center font-bold text-base shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-primary-light text-primary flex items-center justify-center font-bold text-base shrink-0 group-hover:bg-primary group-hover:text-white transition-colors duration-200">
                         <Folder size={20} />
                       </div>
-                      <h3 className="text-lg font-semibold text-text-primary truncate">
+                      <h3 className="text-lg font-semibold text-text-primary group-hover:text-primary transition-colors truncate">
                         {project.name}
                       </h3>
                     </div>

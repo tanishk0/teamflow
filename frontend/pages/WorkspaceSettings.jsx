@@ -120,7 +120,7 @@ export default function WorkspaceSettings() {
   if (loading) {
     return (
       <section className="min-h-screen w-full flex bg-background">
-        <Sidebar items={sidebarItems} />
+        <Sidebar items={sidebarItems} workspaceId={id} />
         <main className="flex-1 p-8">
           <div className="max-w-3xl mx-auto space-y-6">
             <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
@@ -135,7 +135,7 @@ export default function WorkspaceSettings() {
   if (!workspace) {
     return (
       <section className="min-h-screen w-full flex bg-background">
-        <Sidebar items={sidebarItems} />
+        <Sidebar items={sidebarItems} workspaceId={id} />
         <main className="flex-1 flex items-center justify-center p-8">
           <div className="text-center max-w-md">
             <Building2 className="mx-auto text-text-muted mb-3" size={48} />
@@ -165,7 +165,7 @@ export default function WorkspaceSettings() {
 
   return (
     <section className="min-h-screen w-full flex bg-background">
-      <Sidebar items={sidebarItems} />
+      <Sidebar items={sidebarItems} workspaceId={id} />
 
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-3xl mx-auto space-y-8">

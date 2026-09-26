@@ -160,7 +160,7 @@ export default function WorkspaceMembers() {
   if (loading) {
     return (
       <section className="min-h-screen w-full flex bg-gray-50">
-        <Sidebar items={items} />
+        <Sidebar items={items} workspaceId={id} />
 
         <main className="flex-1 p-8">
           <div className="max-w-5xl mx-auto">
@@ -175,7 +175,7 @@ export default function WorkspaceMembers() {
   if (!workspace) {
     return (
       <section className="min-h-screen w-full flex bg-gray-50">
-        <Sidebar items={items} />
+        <Sidebar items={items} workspaceId={id} />
 
         <main className="flex-1 flex items-center justify-center">
           <div className="text-center">
@@ -198,7 +198,7 @@ export default function WorkspaceMembers() {
 
   return (
     <section className="min-h-screen w-full flex bg-gray-50">
-      <Sidebar items={items} />
+      <Sidebar items={items} workspaceId={id} />
 
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-5xl mx-auto">
