@@ -19,7 +19,12 @@ export async function getProject(workspaceId, projectId) {
   const response = await api.get(
     `/workspaces/${workspaceId}/projects/${projectId}`
   );
-  return response.data;
+  return response.data.project || response.data;
+}
+
+export async function getProjectById(projectId) {
+  const response = await api.get(`/workspaces/project/${projectId}`);
+  return response.data.project || response.data;
 }
 
 export async function renameProject(workspaceId, projectId, name) {
@@ -41,6 +46,7 @@ const projectService = {
   createProject,
   getProjects,
   getProject,
+  getProjectById,
   renameProject,
   deleteProject,
 };
