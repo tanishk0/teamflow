@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
 import Button from "../components/Button.jsx";
 import { getWorkspace } from "../src/services/workspaceService.js";
 import projectService from "../src/services/projectService.js";
 import AddProjectModal from "../components/modals/AddProjectModal.jsx";
-import { Folder, FolderPlus, Clock } from "lucide-react";
+import { Folder, FolderPlus, Clock, ArrowLeft } from "lucide-react";
 
 export default function WorkspaceDetail() {
   const { id } = useParams();
@@ -56,6 +56,18 @@ export default function WorkspaceDetail() {
       <Sidebar items={items} workspaceId={id} />
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
+          {/* Top navigation / back link */}
+          <Link
+            to="/workspaces"
+            className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors mb-4 group"
+          >
+            <ArrowLeft
+              size={16}
+              className="group-hover:-translate-x-0.5 transition-transform"
+            />
+            <span>Back to Workspaces</span>
+          </Link>
+
           {/* Header */}
           <div className="flex items-center justify-between mb-8 pb-4 border-b border-border">
             <div>

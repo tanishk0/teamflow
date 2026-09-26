@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { NavLink, Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, Plus, Hash } from "lucide-react";
+import { LogOut, Plus, Hash, ArrowLeft } from "lucide-react";
 import api from "../src/api/axios";
 import projectService from "../src/services/projectService";
 import AddProjectModal from "./modals/AddProjectModal.jsx";
@@ -19,6 +19,18 @@ export default function Sidebar({
       ?.find((item) => item.path?.startsWith("/workspace/"))
       ?.path?.split("/")[2] ||
     null;
+
+  const isChangedSidebar =
+    Boolean(detectedWorkspaceId) ||
+    location.pathname.startsWith("/workspace/") ||
+    location.pathname.startsWith("/team/") ||
+    location.pathname.startsWith("/project/") ||
+    (items.length > 0 &&
+      !items.some(
+        (it) => it.path === "/workspaces" || it.path === "/dashboard"
+      ));
+
+  const isTeam = location.pathname.startsWith("/team/");
 
   const [projects, setProjects] = useState(propProjects || []);
   const [showAddProjectModal, setShowAddProjectModal] = useState(false);
@@ -92,8 +104,30 @@ export default function Sidebar({
           <span className="font-serif italic">Flow</span>
         </div>
 
+        {/* Back button when inside workspace or team (changed sidebar) */}
+        {isChangedSidebar && (
+          <button
+            type="button"
+            onClick={() => {
+              if (isTeam) {
+                navigate("/teams");
+              } else {
+                navigate("/workspaces");
+              }
+            }}
+            className="mt-3 flex items-center gap-2 px-3 py-2 text-xs font-semibold text-text-secondary hover:text-primary rounded-xl hover:bg-gray-100 transition-colors cursor-pointer group select-none border border-border/60 bg-gray-50/50"
+            title={isTeam ? "Back to Teams" : "Back to Workspaces"}
+          >
+            <ArrowLeft
+              size={14}
+              className="group-hover:-translate-x-0.5 transition-transform text-text-muted group-hover:text-primary"
+            />
+            <span>{isTeam ? "Back to Teams" : "Back to Workspaces"}</span>
+          </button>
+        )}
+
         {/* Scrollable Navigation items & Projects */}
-        <div className="flex-1 overflow-y-auto mt-4 pr-1">
+        <div className="flex-1 overflow-y-auto mt-3 pr-1">
           {/* Main items */}
           <div className="flex flex-col">
             {items.map((item, index) => (

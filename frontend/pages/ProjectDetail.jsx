@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useLocation, Link } from "react-router-dom";
+import { useParams, useLocation, useNavigate, Link } from "react-router-dom";
 import Sidebar from "../components/Sidebar.jsx";
 import {
   getWorkspace,
@@ -9,11 +9,12 @@ import projectService from "../src/services/projectService.js";
 import taskService from "../src/services/taskService.js";
 import TaskList from "../components/TaskList.jsx";
 import TaskModal from "../components/modals/TaskModal.jsx";
-import { Folder, ChevronRight, CheckSquare, Plus } from "lucide-react";
+import { Folder, ChevronRight, CheckSquare, Plus, ArrowLeft } from "lucide-react";
 
 export default function ProjectDetail() {
   const { projectId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [workspaceId, setWorkspaceId] = useState(
     () =>
@@ -160,11 +161,11 @@ export default function ProjectDetail() {
     },
     {
       label: "Activity Log",
-      path: workspaceId ? `/workspace/${workspaceId}` : "/workspaces",
+      path: workspaceId ? `/workspace/${workspaceId}/activity` : "/workspaces",
     },
     {
       label: "Members",
-      path: workspaceId ? `/workspace/${workspaceId}` : "/workspaces",
+      path: workspaceId ? `/workspace/${workspaceId}/members` : "/workspaces",
     },
     ...(isOwner && workspaceId
       ? [{ label: "Settings", path: `/workspace/${workspaceId}/settings` }]
@@ -181,22 +182,42 @@ export default function ProjectDetail() {
         {/* Top Header & Horizontal Navigation */}
         <header className="bg-white border-b border-border sticky top-0 z-10 px-8 pt-4">
           <div className="flex items-center justify-between pb-3 gap-4">
-            {/* Breadcrumb & Project Name */}
-            <div className="flex items-center gap-2 min-w-0">
-              <Link
-                to={workspaceId ? `/workspace/${workspaceId}` : "/workspaces"}
-                className="text-sm font-medium text-text-muted hover:text-primary transition-colors truncate max-w-[200px]"
+            {/* Back Button & Breadcrumbs */}
+            <div className="flex items-center gap-3 min-w-0">
+              <button
+                type="button"
+                onClick={() => {
+                  if (workspaceId) {
+                    navigate(`/workspace/${workspaceId}`);
+                  } else {
+                    navigate("/workspaces");
+                  }
+                }}
+                className="p-1.5 text-text-muted hover:text-text-primary hover:bg-gray-100 rounded-lg transition-colors cursor-pointer shrink-0 group"
+                title="Back to Workspace"
               >
-                {workspace?.name || "Workspace"}
-              </Link>
-              <ChevronRight size={14} className="text-text-muted shrink-0" />
+                <ArrowLeft
+                  size={18}
+                  className="group-hover:-translate-x-0.5 transition-transform"
+                />
+              </button>
+
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-md bg-primary-light text-primary flex items-center justify-center font-bold text-xs shrink-0">
-                  <Folder size={14} />
+                <Link
+                  to={workspaceId ? `/workspace/${workspaceId}` : "/workspaces"}
+                  className="text-sm font-medium text-text-muted hover:text-primary transition-colors truncate max-w-[200px]"
+                >
+                  {workspace?.name || "Workspace"}
+                </Link>
+                <ChevronRight size={14} className="text-text-muted shrink-0" />
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-md bg-primary-light text-primary flex items-center justify-center font-bold text-xs shrink-0">
+                    <Folder size={14} />
+                  </div>
+                  <h1 className="text-base font-semibold text-text-primary truncate">
+                    {project?.name || "Project"}
+                  </h1>
                 </div>
-                <h1 className="text-base font-semibold text-text-primary truncate">
-                  {project?.name || "Project"}
-                </h1>
               </div>
             </div>
 

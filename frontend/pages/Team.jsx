@@ -11,6 +11,7 @@ import {
   Trash2,
   AlertTriangle,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import api from "../src/api/axios.js";
 import InviteTeamMemberModal from "../components/modals/InviteTeamMemberModal.jsx";
@@ -134,6 +135,18 @@ export default function Team() {
 
       <main className="flex-1 p-8 overflow-y-auto">
         <div className="max-w-5xl mx-auto">
+          {/* Top navigation / back link */}
+          <Link
+            to="/teams"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors mb-4 group"
+          >
+            <ArrowLeft
+              size={16}
+              className="group-hover:-translate-x-0.5 transition-transform"
+            />
+            <span>Back to Teams</span>
+          </Link>
+
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
