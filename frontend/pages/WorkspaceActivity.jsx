@@ -26,7 +26,7 @@ export default function WorkspaceActivity() {
 
   return (
     <section className="flex min-h-screen w-full bg-gray-50">
-      <Sidebar items={items} />
+      <Sidebar items={items} workspaceId={id} />
       <main className="flex-1 p-8">
         {/* Activity Log remains as is (blank) */}
       </main>
