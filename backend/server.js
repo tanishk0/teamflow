@@ -13,6 +13,7 @@ import workspaceTeamRoutes from "./src/routes/workspaceTeamRoutes.js";
 dotenv.config();
 import projectRoutes from "./src/routes/projectRoute.js"
 import taskRoutes from "./src/routes/taskRoute.js"
+import activityRoutes from "./src/routes/activityRoute.js"
 const app = express()
 
 app.use(cors({
@@ -35,6 +36,7 @@ app.use("/api/workspaces", workspaceTeamRoutes);
 app.use("/api/workspaces", projectRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/projects/:projectId/tasks", taskRoutes);
+app.use("/api/activity", activityRoutes);
 
 // base req
 app.get("/" , (req , res)=> {
