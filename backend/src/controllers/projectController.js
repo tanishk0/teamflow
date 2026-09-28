@@ -1,6 +1,7 @@
-import Project from "../db/Project.js"
+import Project from "../db/Project.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import Task from "../db/Task.js";
+import { logActivity } from "../utils/activityLogger.js";
 export async function createProject(req, res){
     const {name, description} = req.body;
     const {workspaceId} = req.params;
@@ -40,6 +41,18 @@ export async function createProject(req, res){
                 createdBy: req.userId,
             }
         )
+
+        await logActivity({
+            workspaceId,
+            actorId: req.userId,
+            action: "project_created",
+            entityType: "project",
+            entityId: project._id,
+            entityName: project.name,
+            description: `Created project "${project.name}"`,
+            details: { projectId: project._id, projectName: project.name },
+        });
+
         return res.status(201).json({
             message: "Project created successfully",
             project,
@@ -148,6 +161,17 @@ export async function renameProject(req, res){
             { new: true }
         );
 
+        await logActivity({
+            workspaceId: project.workspaceId,
+            actorId: req.userId,
+            action: "project_renamed",
+            entityType: "project",
+            entityId: project._id,
+            entityName: trimmed,
+            description: `Renamed project "${project.name}" to "${trimmed}"`,
+            details: { oldName: project.name, newName: trimmed },
+        });
+
         res.status(200).json({
             message: "Project renamed successfully",
             project: updatedProject,
@@ -181,6 +205,18 @@ export async function deleteProject(req,res){
         }
 
         await Project.findByIdAndDelete(id);
+
+        await logActivity({
+            workspaceId: project.workspaceId,
+            actorId: req.userId,
+            action: "project_deleted",
+            entityType: "project",
+            entityId: project._id,
+            entityName: project.name,
+            description: `Deleted project "${project.name}"`,
+            details: { projectName: project.name },
+        });
+
         return res.status(200).json({
             message: "Project deleted successfully",
         });
