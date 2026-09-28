@@ -1,6 +1,9 @@
 import Workspace from "../db/Workspace.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import Invitation from "../db/Invitation.js";
+import Project from "../db/Project.js";
+import ActivityLog from "../db/ActivityLog.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 export async function createWorkspace(req, res) {
   const { name } = req.body;
@@ -41,6 +44,17 @@ export async function createWorkspace(req, res) {
       role: "owner",
       status: "active",
     });
+
+    await logActivity({
+      workspaceId: workspace._id,
+      actorId: req.userId,
+      action: "workspace_created",
+      entityType: "workspace",
+      entityId: workspace._id,
+      entityName: workspace.name,
+      description: `Created workspace "${workspace.name}"`,
+    });
+
     res.status(201).json({
       message: "Workspace created successfully",
       workspace,
@@ -54,27 +68,44 @@ export async function createWorkspace(req, res) {
   }
 }
 
-export async function getWorkspaces(req , res){
-    try{
-        const members = await WorkspaceMember
-            .find({
-                userId: req.userId,
-                status: "active"
-            })
-            .populate("workspaceId");
-        const workspaces = members
-            .map((member) => member.workspaceId)
-            .filter(Boolean);
+export async function getWorkspaces(req, res) {
+  try {
+    const members = await WorkspaceMember.find({
+      userId: req.userId,
+      status: "active",
+    }).populate("workspaceId");
 
-        res.status(200).json({
-            workspaces
-        });
-    }
-    catch(error){
-        res.status(500).json({
-            message: "Failed to fetch workspaces"
-        });
-    }
+    const validWorkspaces = members
+      .map((member) => member.workspaceId)
+      .filter(Boolean);
+
+    const workspaceIds = validWorkspaces.map((w) => w._id);
+
+    const projectCounts = await Project.aggregate([
+      { $match: { workspaceId: { $in: workspaceIds } } },
+      { $group: { _id: "$workspaceId", count: { $sum: 1 } } },
+    ]);
+
+    const countMap = projectCounts.reduce((acc, curr) => {
+      acc[curr._id.toString()] = curr.count;
+      return acc;
+    }, {});
+
+    const workspaces = validWorkspaces.map((w) => {
+      const obj = w.toObject ? w.toObject() : { ...w };
+      obj.projectsCount = countMap[obj._id.toString()] || 0;
+      return obj;
+    });
+
+    res.status(200).json({
+      workspaces,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to fetch workspaces",
+      error: error.message,
+    });
+  }
 }
 
 export async function getWorkspace(req, res) {
@@ -165,6 +196,17 @@ export async function renameWorkspace(req, res) {
       });
     }
 
+    await logActivity({
+      workspaceId: workspace._id,
+      actorId: req.userId,
+      action: "workspace_renamed",
+      entityType: "workspace",
+      entityId: workspace._id,
+      entityName: trimmed,
+      description: `Renamed workspace to "${trimmed}"`,
+      details: { newName: trimmed },
+    });
+
     res.status(200).json({
       message: "Workspace renamed successfully",
       workspace,
@@ -198,6 +240,9 @@ export async function deleteWorkspace(req, res) {
       workspaceId: id,
     });
 
+    await ActivityLog.deleteMany({
+      workspaceId: id,
+    });
 
     return res.status(200).json({
       message: "Workspace deleted successfully",
@@ -299,6 +344,16 @@ export async function removeWorkspaceMember(req, res) {
       });
     }
 
+    await logActivity({
+      workspaceId: id,
+      actorId: req.userId,
+      action: "member_removed",
+      entityType: "member",
+      entityId: userId,
+      description: `Removed a member from the workspace`,
+      details: { removedUserId: userId },
+    });
+
     return res.status(200).json({
       message: "Member removed from workspace successfully",
     });
@@ -375,6 +430,19 @@ export async function updateWorkspaceMemberRole(req, res) {
         message: "Member not found in this workspace",
       });
     }
+
+    const memberName =
+      updatedMember.userId?.name || updatedMember.userId?.email || "Member";
+    await logActivity({
+      workspaceId: id,
+      actorId: req.userId,
+      action: "member_role_updated",
+      entityType: "member",
+      entityId: userId,
+      entityName: memberName,
+      description: `Updated role for ${memberName} to ${role}`,
+      details: { targetUserId: userId, newRole: role },
+    });
 
     return res.status(200).json({
       message: "Member role updated successfully",
