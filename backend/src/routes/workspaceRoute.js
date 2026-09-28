@@ -9,6 +9,10 @@ import {
   removeWorkspaceMember,
   updateWorkspaceMemberRole,
 } from "../controllers/workspaceController.js";
+import {
+  getActivityLogs,
+  getActivityStats,
+} from "../controllers/activityController.js";
 import { requireAuth } from "../middleware/authMiddleware.js";
 import {
   createInvite,
@@ -22,6 +26,8 @@ const router = express.Router();
 router.post("/", requireAuth, createWorkspace);
 router.get("/", requireAuth, getWorkspaces);
 router.get("/:id", requireAuth, getWorkspace);
+router.get("/:id/activity", requireAuth, getActivityLogs);
+router.get("/:id/activity/stats", requireAuth, getActivityStats);
 router.get("/:id/members", requireAuth, getWorkspaceMembers);
 router.patch("/:id/members/role", requireAuth, updateWorkspaceMemberRole);
 router.delete("/:id/members", requireAuth, removeWorkspaceMember);
