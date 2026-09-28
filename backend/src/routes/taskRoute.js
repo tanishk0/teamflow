@@ -3,6 +3,7 @@ import {
   createTask,
   getTasks,
   getTask,
+  getMyTasks,
   updateTask,
   deleteTask,
 } from "../controllers/taskController.js";
@@ -16,6 +17,7 @@ router.get("/project/:projectId", requireAuth, getTasks);
 
 // Root routes (used for direct /api/tasks or nested /api/projects/:projectId/tasks)
 router.post("/", requireAuth, createTask);
+router.get("/my", requireAuth, getMyTasks);
 router.get("/", requireAuth, getTasks);
 router.get("/:taskId", requireAuth, getTask);
 router.patch("/:taskId", requireAuth, updateTask);
