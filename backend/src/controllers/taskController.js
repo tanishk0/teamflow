@@ -3,6 +3,7 @@ import Task from "../db/Task.js";
 import Project from "../db/Project.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import Workspace from "../db/Workspace.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 async function checkWorkspaceManagerOrOwner(workspaceId, userId) {
   const member = await WorkspaceMember.findOne({
@@ -99,6 +100,24 @@ export async function createTask(req, res) {
 
     // Touch project updatedAt for latest activity
     await Project.findByIdAndUpdate(projectId, { updatedAt: new Date() });
+
+    await logActivity({
+      workspaceId: project.workspaceId,
+      actorId: req.userId,
+      action: "task_created",
+      entityType: "task",
+      entityId: task._id,
+      entityName: task.title,
+      description: `Created task "${task.title}" in project "${project.name}"`,
+      details: {
+        taskId: task._id,
+        projectId: project._id,
+        projectName: project.name,
+        taskTitle: task.title,
+        status: task.status,
+        assigneeName: task.assigneeId?.name || task.assigneeId?.email || "",
+      },
+    });
 
     return res.status(201).json({
       message: "Task created successfully",
@@ -225,6 +244,32 @@ export async function getTask(req, res) {
   }
 }
 
+export async function getMyTasks(req, res) {
+  try {
+    const tasks = await Task.find({ assigneeId: req.userId })
+      .populate({
+        path: "projectId",
+        select: "name workspaceId",
+        populate: {
+          path: "workspaceId",
+          select: "name",
+        },
+      })
+      .sort({ createdAt: -1 })
+      .limit(30);
+
+    return res.status(200).json({
+      message: "My tasks fetched successfully",
+      tasks,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch my tasks",
+      error: error.message,
+    });
+  }
+}
+
 export async function updateTask(req, res) {
   const taskId = req.params.taskId || req.params.id;
   const { title, status, assigneeId, priority, dueDate, section } = req.body;
@@ -340,6 +385,47 @@ export async function updateTask(req, res) {
     // Touch project updatedAt for latest activity
     await Project.findByIdAndUpdate(task.projectId, { updatedAt: new Date() });
 
+    let activityAction = "task_updated";
+    let activityDescription = `Updated task "${updatedTask.title}"`;
+
+    if (status !== undefined && status !== task.status) {
+      activityAction = "task_status_changed";
+      const statusLabel =
+        status === "done"
+          ? "Done"
+          : status === "in_progress"
+          ? "In Progress"
+          : "Todo";
+      activityDescription = `Changed status of "${updatedTask.title}" to ${statusLabel}`;
+    } else if (
+      assigneeId !== undefined &&
+      targetAssigneeStr !== currentAssigneeStr
+    ) {
+      activityAction = "task_assigned";
+      const assigneeName =
+        updatedTask.assigneeId?.name ||
+        updatedTask.assigneeId?.email ||
+        "member";
+      activityDescription = `Assigned task "${updatedTask.title}" to ${assigneeName}`;
+    }
+
+    await logActivity({
+      workspaceId: project.workspaceId,
+      actorId: req.userId,
+      action: activityAction,
+      entityType: "task",
+      entityId: updatedTask._id,
+      entityName: updatedTask.title,
+      description: activityDescription,
+      details: {
+        taskId: updatedTask._id,
+        projectId: project._id,
+        projectName: project.name,
+        oldStatus: task.status,
+        newStatus: updatedTask.status,
+      },
+    });
+
     return res.status(200).json({
       message: "Task updated successfully",
       task: updatedTask,
@@ -391,6 +477,22 @@ export async function deleteTask(req, res) {
 
     // Touch project updatedAt for latest activity
     await Project.findByIdAndUpdate(task.projectId, { updatedAt: new Date() });
+
+    await logActivity({
+      workspaceId: project.workspaceId,
+      actorId: req.userId,
+      action: "task_deleted",
+      entityType: "task",
+      entityId: task._id,
+      entityName: task.title,
+      description: `Deleted task "${task.title}" from project "${project.name}"`,
+      details: {
+        taskId: task._id,
+        projectId: project._id,
+        projectName: project.name,
+        taskTitle: task.title,
+      },
+    });
 
     return res.status(200).json({
       message: "Task deleted successfully",
