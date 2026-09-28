@@ -1,6 +1,7 @@
 import Workspace from "../db/Workspace.js";
 import Team from "../db/Team.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 export async function addTeamsToWorkspace(req, res) {
   const { workspaceId } = req.params;
@@ -104,6 +105,19 @@ export async function addTeamsToWorkspace(req, res) {
         upserted: result.upsertedId,
       });
     }
+
+    const teamNames = teams.map((t) => t.name).filter(Boolean);
+    await logActivity({
+      workspaceId,
+      actorId: req.userId,
+      action: "team_added",
+      entityType: "team",
+      entityName: teamNames.join(", "),
+      description: `Added team members from ${
+        teamNames.length > 0 ? teamNames.map((n) => `"${n}"`).join(", ") : "teams"
+      } to workspace`,
+      details: { teamIds, teamNames },
+    });
 
     return res.status(200).json({
       message: "Teams added to workspace successfully",
