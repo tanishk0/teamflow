@@ -1,8 +1,8 @@
 import Workspace from "../db/Workspace.js";
-
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import User from "../db/User.js";
-import Invitation from "../db/Invitation.js"
+import Invitation from "../db/Invitation.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 export async function getInvites(req, res) {
     try {
@@ -131,6 +131,17 @@ export async function createInvite(req, res) {
 
     console.log("INVITATION CREATED:", invitation._id);
 
+    await logActivity({
+      workspaceId,
+      actorId: req.userId,
+      action: "member_invited",
+      entityType: "invitation",
+      entityId: invitation._id,
+      entityName: email.toLowerCase().trim(),
+      description: `Invited ${email.toLowerCase().trim()} to join the workspace as ${role}`,
+      details: { email: email.toLowerCase().trim(), role },
+    });
+
     return res.status(201).json({
       message: "Invitation sent successfully",
       invitation,
@@ -177,6 +188,18 @@ export async function acceptInvite(req, res){
             role: invitation.role,
             status: "active",
         });
+
+        await logActivity({
+            workspaceId: invitation.workspaceId,
+            actorId: req.userId,
+            action: "member_joined",
+            entityType: "member",
+            entityId: req.userId,
+            entityName: user?.name || user?.email || "New member",
+            description: `${user?.name || user?.email || "A new member"} joined the workspace as ${invitation.role}`,
+            details: { role: invitation.role, email: invitation.email },
+        });
+
         res.status(200).json({
             message: "Invite accepted"
         })
