@@ -27,8 +27,14 @@ export async function deleteTask(taskId) {
   return response.data;
 }
 
+export async function getMyTasks() {
+  const response = await api.get("/tasks/my");
+  return response.data.tasks || [];
+}
+
 const taskService = {
   getTasks,
+  getMyTasks,
   createTask,
   getTask,
   updateTask,
