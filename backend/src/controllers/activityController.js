@@ -182,6 +182,13 @@ export async function getUserActivityFeed(req, res) {
       ])
     ).map((id) => new mongoose.Types.ObjectId(id));
 
+    if (workspaceIds.length === 0) {
+      return res.status(200).json({
+        message: "User activity feed fetched successfully",
+        activities: [],
+      });
+    }
+
     const activities = await ActivityLog.find({
       workspaceId: { $in: workspaceIds },
     })
@@ -190,9 +197,13 @@ export async function getUserActivityFeed(req, res) {
       .sort({ createdAt: -1 })
       .limit(15);
 
+    const validActivities = activities.filter(
+      (act) => act.workspaceId && act.actorId
+    );
+
     return res.status(200).json({
       message: "User activity feed fetched successfully",
-      activities,
+      activities: validActivities,
     });
   } catch (error) {
     return res.status(500).json({
