@@ -3,6 +3,7 @@ import Task from "../db/Task.js";
 import Project from "../db/Project.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import Workspace from "../db/Workspace.js";
+import ActivityLog from "../db/ActivityLog.js";
 import { logActivity } from "../utils/activityLogger.js";
 
 async function checkWorkspaceManagerOrOwner(workspaceId, userId) {
@@ -246,7 +247,49 @@ export async function getTask(req, res) {
 
 export async function getMyTasks(req, res) {
   try {
-    const tasks = await Task.find({ assigneeId: req.userId })
+    // 1. Find all active workspaces where the user is an owner or active member
+    const memberships = await WorkspaceMember.find({
+      userId: req.userId,
+      status: "active",
+    }).select("workspaceId");
+
+    const ownedWorkspaces = await Workspace.find({
+      owner: req.userId,
+    }).select("_id");
+
+    const activeWorkspaceIds = Array.from(
+      new Set([
+        ...memberships.map((m) => m.workspaceId?.toString()).filter(Boolean),
+        ...ownedWorkspaces.map((w) => w._id?.toString()).filter(Boolean),
+      ])
+    );
+
+    if (activeWorkspaceIds.length === 0) {
+      return res.status(200).json({
+        message: "My tasks fetched successfully",
+        tasks: [],
+      });
+    }
+
+    // 2. Find all projects belonging to these active workspaces
+    const validProjects = await Project.find({
+      workspaceId: { $in: activeWorkspaceIds },
+    }).select("_id");
+
+    const validProjectIds = validProjects.map((p) => p._id);
+
+    if (validProjectIds.length === 0) {
+      return res.status(200).json({
+        message: "My tasks fetched successfully",
+        tasks: [],
+      });
+    }
+
+    // 3. Find tasks assigned to user that belong to valid projects
+    const tasks = await Task.find({
+      assigneeId: req.userId,
+      projectId: { $in: validProjectIds },
+    })
       .populate({
         path: "projectId",
         select: "name workspaceId",
@@ -258,9 +301,14 @@ export async function getMyTasks(req, res) {
       .sort({ createdAt: -1 })
       .limit(30);
 
+    // Double check that populated references are fully intact
+    const cleanTasks = tasks.filter(
+      (task) => task.projectId && task.projectId.workspaceId
+    );
+
     return res.status(200).json({
       message: "My tasks fetched successfully",
-      tasks,
+      tasks: cleanTasks,
     });
   } catch (error) {
     return res.status(500).json({
@@ -474,6 +522,15 @@ export async function deleteTask(req, res) {
     }
 
     await Task.findByIdAndDelete(taskId);
+
+    // Clean up previous activity logs for this task
+    await ActivityLog.deleteMany({
+      workspaceId: project.workspaceId,
+      $or: [
+        { entityId: task._id },
+        { "details.taskId": task._id },
+      ],
+    });
 
     // Touch project updatedAt for latest activity
     await Project.findByIdAndUpdate(task.projectId, { updatedAt: new Date() });
