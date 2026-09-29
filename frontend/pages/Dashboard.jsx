@@ -168,6 +168,20 @@ function getActivityDisplay(activity, currentUserId) {
       iconType = "file";
       iconColor = "bg-amber-50 text-amber-700";
       break;
+    case "task_deleted":
+      actionTitle = `${actorName} deleted a task`;
+      details = `${activity.entityName || "Task"}${
+        activity.details?.projectName ? ` • ${activity.details.projectName}` : ""
+      }`;
+      iconType = "file";
+      iconColor = "bg-rose-50 text-rose-600";
+      break;
+    case "project_deleted":
+      actionTitle = `${actorName} deleted a project`;
+      details = `${activity.entityName || "Project"}`;
+      iconType = "file";
+      iconColor = "bg-rose-50 text-rose-600";
+      break;
     default:
       actionTitle = `${actorName} updated an item`;
       details = activity.description || "";
@@ -375,7 +389,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="divide-y divide-border/60 flex-1">
-                  {myTasks.length === 0 ? (
+                  {myTasks.filter((t) => t.projectId && t.projectId.workspaceId).length === 0 ? (
                     <div className="py-16 flex flex-col items-center justify-center text-center text-text-muted">
                       <CheckSquare size={32} className="text-primary/30 mb-2" />
                       <p className="text-sm font-medium text-text-secondary">
@@ -386,7 +400,10 @@ export default function Dashboard() {
                       </p>
                     </div>
                   ) : (
-                    myTasks.slice(0, 5).map((task) => {
+                    myTasks
+                      .filter((t) => t.projectId && t.projectId.workspaceId)
+                      .slice(0, 5)
+                      .map((task) => {
                       const isDone = task.status === "done";
                       const { text: dueText, isUrgent } = formatDueDate(
                         task.dueDate
