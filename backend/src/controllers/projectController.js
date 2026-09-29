@@ -1,6 +1,7 @@
 import Project from "../db/Project.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import Task from "../db/Task.js";
+import ActivityLog from "../db/ActivityLog.js";
 import { logActivity } from "../utils/activityLogger.js";
 export async function createProject(req, res){
     const {name, description} = req.body;
@@ -204,8 +205,28 @@ export async function deleteProject(req,res){
             return res.status(403).json({ message: "Not authorized" });
         }
 
+        // 1. Find all task IDs for this project
+        const tasks = await Task.find({ projectId: id }).select("_id");
+        const taskIds = tasks.map((t) => t._id);
+
+        // 2. Cascade delete all tasks belonging to this project
+        await Task.deleteMany({ projectId: id });
+
+        // 3. Clean up past activity logs for this project and its tasks
+        await ActivityLog.deleteMany({
+            workspaceId: project.workspaceId,
+            $or: [
+                { entityId: project._id },
+                { "details.projectId": project._id },
+                { entityId: { $in: taskIds } },
+                { "details.taskId": { $in: taskIds } },
+            ],
+        });
+
+        // 4. Delete the project itself
         await Project.findByIdAndDelete(id);
 
+        // 5. Log project_deleted activity
         await logActivity({
             workspaceId: project.workspaceId,
             actorId: req.userId,
