@@ -2,6 +2,7 @@ import Workspace from "../db/Workspace.js";
 import WorkspaceMember from "../db/WorkspaceMember.js";
 import Invitation from "../db/Invitation.js";
 import Project from "../db/Project.js";
+import Task from "../db/Task.js";
 import ActivityLog from "../db/ActivityLog.js";
 import { logActivity } from "../utils/activityLogger.js";
 
@@ -223,8 +224,7 @@ export async function deleteWorkspace(req, res) {
   try {
     const { id } = req.params;
 
-    const workspace = await Workspace.findByIdAndDelete(id);
-
+    const workspace = await Workspace.findById(id);
 
     if (!workspace) {
       return res.status(404).json({
@@ -232,6 +232,23 @@ export async function deleteWorkspace(req, res) {
       });
     }
 
+    // 1. Find all projects in this workspace
+    const projects = await Project.find({ workspaceId: id }).select("_id");
+    const projectIds = projects.map((p) => p._id);
+
+    // 2. Cascade delete all tasks belonging to projects of this workspace
+    if (projectIds.length > 0) {
+      await Task.deleteMany({
+        projectId: { $in: projectIds },
+      });
+    }
+
+    // 3. Cascade delete all projects in this workspace
+    await Project.deleteMany({
+      workspaceId: id,
+    });
+
+    // 4. Cascade delete members, invitations, and activity logs
     await WorkspaceMember.deleteMany({
       workspaceId: id,
     });
@@ -243,6 +260,9 @@ export async function deleteWorkspace(req, res) {
     await ActivityLog.deleteMany({
       workspaceId: id,
     });
+
+    // 5. Delete the workspace document
+    await Workspace.findByIdAndDelete(id);
 
     return res.status(200).json({
       message: "Workspace deleted successfully",
